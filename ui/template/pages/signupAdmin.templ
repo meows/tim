@@ -1,8 +1,8 @@
 package pages
 
-templ Login() {
+templ SignUpAdmin() {
 	<div class="ml-auto mr-auto w-1/2 max-w-2xl">
-		<form action="/login" method="post" class="">
+		<form action="/_/signup" method="post" class="">
 			<label class="input input-bordered flex items-center gap-2">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -65,7 +65,7 @@ templ Login() {
 				</svg>
 				<input type="password" name="password_confirm" class="grow" placeholder="Confirm password"/>
 			</label>
-			<button type="button">Submit</button>
+			<button type="submit">Submit</button>
 		</form>
 	</div>
 }

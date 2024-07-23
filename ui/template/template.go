@@ -7,8 +7,8 @@ import (
 )
 
 type PagesStruct struct {
-	Index func() templ.Component
-	Login func() templ.Component
+	Index       func() templ.Component
+	SignUpAdmin func() templ.Component
 }
 
 type PartialStruct struct {
@@ -17,8 +17,8 @@ type PartialStruct struct {
 }
 
 var Pages = PagesStruct{
-	Index: pages.Index,
-	Login: pages.Login,
+	Index:       pages.Index,
+	SignUpAdmin: pages.SignUpAdmin,
 }
 
 var Partials = PartialStruct{
