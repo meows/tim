@@ -16,10 +16,9 @@ func (app *application) routes() http.Handler {
 	mux.HandleFunc("GET /blog/{id}", app.handleGetBlogPost)
 	mux.HandleFunc("GET /_", app.handleDisplayAdminPage)
 
-	// Create a middleware chain containing our 'standard' middleware
-	// which will be used for every request our application receives.
+	mux.HandleFunc("POST /_/signup", app.handleAdminSignupPost)
+
 	standard := alice.New(app.recoverPanic, app.logRequest, commonHeaders)
 
-	// Return the 'standard' middleware chain followed by the servemux.
 	return standard.Then(mux)
 }

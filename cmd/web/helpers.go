@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"regexp"
 	"runtime/debug"
 )
 
@@ -18,3 +19,15 @@ func (app *application) serverError(w http.ResponseWriter, r *http.Request, err 
 func (app *application) clientError(w http.ResponseWriter, status int) {
 	http.Error(w, http.StatusText(status), status)
 }
+
+func isValidEmail(email string) bool {
+	const emailRegexPattern = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+
+	re := regexp.MustCompile(emailRegexPattern)
+
+	return re.MatchString(email)
+}
+
+// func (app *application) newDashboardTemplate(r *http.Request) *template.Template {
+//   return
+// }
