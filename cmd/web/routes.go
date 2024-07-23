@@ -10,5 +10,6 @@ func (app *application) routes() *http.ServeMux {
 
 	mux.HandleFunc("GET /{$}", app.home)
 	mux.HandleFunc("GET /blog/{id}", app.handleGetBlogPost)
+	mux.HandleFunc("GET /_", app.handleDisplayAdminPage)
 	return mux
 }

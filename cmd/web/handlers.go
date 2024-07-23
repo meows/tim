@@ -10,7 +10,8 @@ import (
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
-	page := template.Base("Home", "Welcome to the home page.")
+	index := template.Pages.Index()
+	page := template.Base("Home", index)
 	page.Render(context.Background(), w)
 }
 
@@ -23,4 +24,13 @@ func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request
 
 	display := fmt.Sprintf("Display the blog post with ID %d", id)
 	w.Write([]byte(display))
+}
+
+func (app *application) handleDisplayAdminPage(w http.ResponseWriter, r *http.Request) {
+	// If not logged in display login form
+	loginPage := template.Pages.Login()
+	page := template.Base("Admin Login", loginPage)
+	page.Render(context.Background(), w)
+
+	// Else display admin dashboard
 }
