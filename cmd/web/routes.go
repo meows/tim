@@ -12,11 +12,17 @@ func (app *application) routes() http.Handler {
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
 
-	mux.HandleFunc("GET /{$}", app.home)
-	mux.HandleFunc("GET /blog/{id}", app.handleGetBlogPost)
-	mux.HandleFunc("GET /_", app.handleDisplayAdminPage)
+	dynamic := alice.New(app.sessionManager.LoadAndSave)
+	mux.Handle("GET /{$}", dynamic.ThenFunc(app.home))
+	mux.Handle("GET /blog/{id}", dynamic.ThenFunc(app.handleGetBlogPost))
 
-	mux.HandleFunc("POST /_/signup", app.handleAdminSignupPost)
+	// Admin routes
+	mux.Handle("GET /_", dynamic.ThenFunc(app.handleDisplayAdminPage))
+	mux.Handle("GET /_/signup", dynamic.ThenFunc(app.handleAdminSignupPage))
+	mux.Handle("POST /_/signup", dynamic.ThenFunc(app.handleAdminSignupPost))
+	mux.Handle("GET /_/login", dynamic.ThenFunc(app.handleAdminLoginPage))
+	mux.Handle("POST /_/login", dynamic.ThenFunc(app.handleAdminLoginPost))
+	mux.Handle("POST /_/logout", dynamic.ThenFunc(app.handleAdmingLogoutPost))
 
 	standard := alice.New(app.recoverPanic, app.logRequest, commonHeaders)
 

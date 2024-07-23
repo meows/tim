@@ -6,6 +6,10 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"time"
+
+	"github.com/alexedwards/scs/sqlite3store"
+	"github.com/alexedwards/scs/v2"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/timenglesf/personal-site/internal/models"
@@ -14,11 +18,12 @@ import (
 var version = "1.0.0"
 
 type application struct {
-	logger *slog.Logger
-	cfg    *config
-	meta   *models.MetaModel
-	user   *models.UserModel
-	db     *sql.DB
+	logger         *slog.Logger
+	cfg            *config
+	meta           *models.MetaModel
+	user           *models.UserModel
+	db             *sql.DB
+	sessionManager *scs.SessionManager
 }
 
 type config struct {
@@ -50,12 +55,17 @@ func main() {
 
 	logger.Info("Successfully connected to the database", "dsn", cfg.db.dsn)
 
+	sessionManager := scs.New()
+	sessionManager.Store = sqlite3store.New(db)
+	sessionManager.Lifetime = 24 * 7 * time.Hour
+
 	app := &application{
-		logger: logger,
-		cfg:    &cfg,
-		meta:   &models.MetaModel{DB: db},
-		user:   &models.UserModel{DB: db},
-		db:     db,
+		logger:         logger,
+		cfg:            &cfg,
+		meta:           &models.MetaModel{DB: db},
+		user:           &models.UserModel{DB: db},
+		db:             db,
+		sessionManager: sessionManager,
 	}
 
 	meta := models.Meta{
