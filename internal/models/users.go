@@ -31,3 +31,15 @@ func (m *UserModel) GetAdmin() (*User, error) {
 
 	return &user, nil
 }
+
+func (m *UserModel) Insert(username, email, password string, isAdmin bool) error {
+	return nil
+}
+
+func (m *UserModel) Authenticate(email, password string) (int, error) {
+	return 0, nil
+}
+
+func (m *UserModel) Exists(id int) (bool, error) {
+	return false, nil
+}

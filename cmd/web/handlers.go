@@ -56,7 +56,6 @@ type adminSignupForm struct {
 	ConfirmEmail    string
 	Password        string
 	ConfirmPassword string
-	FieldErrors     map[string]string
 }
 
 func (app *application) handleAdminSignupPost(w http.ResponseWriter, r *http.Request) {
@@ -73,6 +72,7 @@ func (app *application) handleAdminSignupPost(w http.ResponseWriter, r *http.Req
 	}
 
 	// Read form data
+	r.Body = http.MaxBytesReader(w, r.Body, 4096)
 	err = r.ParseForm()
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
@@ -106,8 +106,26 @@ func (app *application) handleAdminSignupPost(w http.ResponseWriter, r *http.Req
 	}
 
 	if len(fieldErrors) > 0 {
+		fmt.Fprintln(w, fieldErrors)
+		return
 	}
 
 	fmt.Println(form)
 	w.Write([]byte("Admin signup form submitted"))
+}
+
+func (app *application) handleAdminSignupPage(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Admin signup page")
+}
+
+func (app *application) handleAdminLoginPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Adming login POST")
+}
+
+func (app *application) handleAdminLoginPage(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Admin login page")
+}
+
+func (app *application) handleAdmingLogoutPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Admin logout POST")
 }

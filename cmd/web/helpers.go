@@ -28,6 +28,9 @@ func isValidEmail(email string) bool {
 	return re.MatchString(email)
 }
 
-// func (app *application) newDashboardTemplate(r *http.Request) *template.Template {
-//   return
+// func (app *application) newTemplateData(r *http.Request) *templateData {
+// 	return &templateData{
+// 		CurrentYear: time.Now().Year(),
+//
+// 	}
 // }

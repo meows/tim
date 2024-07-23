@@ -9,7 +9,7 @@ type adminTemplateData struct {
 	Admin       models.User
 }
 
-type templateData struct {
+type TemplateData struct {
 	CurrentYear int
 	Blogs       any
 	Blog        any
