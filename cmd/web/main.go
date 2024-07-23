@@ -17,6 +17,7 @@ type application struct {
 	logger *slog.Logger
 	cfg    *config
 	meta   *models.MetaModel
+	user   *models.UserModel
 	db     *sql.DB
 }
 
@@ -53,6 +54,7 @@ func main() {
 		logger: logger,
 		cfg:    &cfg,
 		meta:   &models.MetaModel{DB: db},
+		user:   &models.UserModel{DB: db},
 		db:     db,
 	}
 
