@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/timenglesf/personal-site/internal/models"
 	"github.com/timenglesf/personal-site/ui/template"
+	"github.com/yuin/goldmark"
 )
 
 func (app *application) handleCreateBlogPost(w http.ResponseWriter, r *http.Request) {
@@ -47,6 +49,15 @@ func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request
 
 	data := app.newPostTemplateData(r)
 	data.BlogPost = post
+
+	// convert markdown to html
+	var buf bytes.Buffer
+	if err := goldmark.Convert([]byte(data.BlogPost.Content), &buf); err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	data.BlogPost.ContentHTML = buf.String()
 	page := template.Pages.Post(*data)
 
 	w.Header().Set("Content-Type", "text/html")

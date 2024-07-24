@@ -8,13 +8,14 @@ import (
 )
 
 type Post struct {
-	ID        int       `json:"id" db:"id"`
-	Title     string    `json:"title" db:"title"`
-	Content   string    `json:"content" db:"content"`
-	Private   bool      `json:"private" db:"private"`
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
-	AuthorID  int       `json:"author_id" db:"author_id"`
+	ID          int       `json:"id" db:"id"`
+	Title       string    `json:"title" db:"title"`
+	Content     string    `json:"content" db:"content"`
+	ContentHTML string    `json:"content_html"`
+	Private     bool      `json:"private" db:"private"`
+	CreatedAt   time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
+	AuthorID    int       `json:"author_id" db:"author_id"`
 }
 
 type PostModel struct {
