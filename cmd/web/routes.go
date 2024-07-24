@@ -17,6 +17,7 @@ func (app *application) routes() http.Handler {
 
 	// Posts
 	mux.Handle("GET /post/view/{id}", dynamic.ThenFunc(app.handleGetBlogPost))
+	mux.Handle("GET /post/create", dynamic.ThenFunc(app.handleDisplayCreatePostForm))
 	mux.Handle("POST /post/create", dynamic.ThenFunc(app.handleCreateBlogPost))
 	mux.Handle("GET /post/latest", dynamic.ThenFunc(app.handleGetLatestBlogPosts))
 

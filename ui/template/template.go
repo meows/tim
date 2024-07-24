@@ -11,6 +11,7 @@ type PagesStruct struct {
 	Index       func() templ.Component
 	SignUpAdmin func() templ.Component
 	Post        func(shared.PostTemplateData) templ.Component
+	CreatePost  func() templ.Component
 }
 
 type PartialStruct struct {
@@ -22,6 +23,7 @@ var Pages = PagesStruct{
 	Index:       pages.Index,
 	SignUpAdmin: pages.SignUpAdmin,
 	Post:        pages.Post,
+	CreatePost:  pages.CreatePost,
 }
 
 var Partials = PartialStruct{

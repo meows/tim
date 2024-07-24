@@ -13,14 +13,28 @@ import (
 	"github.com/yuin/goldmark"
 )
 
+// Create Post Handlers
+
+func (app *application) handleDisplayCreatePostForm(w http.ResponseWriter, r *http.Request) {
+	// TODO: Make sure user is logged in and is an admin
+
+	page := template.Pages.CreatePost()
+	w.Header().Set("Content-Type", "text/html")
+	base := template.Base("Create Post", true, page)
+	if err := base.Render(context.Background(), w); err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+}
+
 func (app *application) handleCreateBlogPost(w http.ResponseWriter, r *http.Request) {
-	title := "My second blog post"
-	content := `<h1>The Second Blog Post</h1>
-        <p>Hello, world! This is my second blog post. I'm excited to start sharing my thoughts and experiences with you. In this blog, I'll be covering a variety of topics, including technology, travel, and personal growth. Stay tuned for more updates, and thank you for joining me on this journey!</p>
-        <p>Feel free to leave a comment or reach out to me through my social media channels. Let's connect and share our stories!</p>
-        <footer>
-            <p>Posted on July 21, 2024 by Author Name</p>
-        </footer>`
+	if err := r.ParseForm(); err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	title := r.PostFormValue("title")
+	content := r.PostFormValue("content")
 
 	id, err := app.post.Insert(title, content, false, 0)
 	if err != nil {
