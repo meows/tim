@@ -22,6 +22,7 @@ type application struct {
 	cfg            *config
 	meta           *models.MetaModel
 	user           *models.UserModel
+	post           *models.PostModel
 	db             *sql.DB
 	sessionManager *scs.SessionManager
 }
@@ -64,6 +65,7 @@ func main() {
 		cfg:            &cfg,
 		meta:           &models.MetaModel{DB: db},
 		user:           &models.UserModel{DB: db},
+		post:           &models.PostModel{DB: db},
 		db:             db,
 		sessionManager: sessionManager,
 	}
