@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/timenglesf/personal-site/internal/models"
+	"github.com/timenglesf/personal-site/ui/template"
 )
 
 func (app *application) handleCreateBlogPost(w http.ResponseWriter, r *http.Request) {
@@ -43,7 +45,14 @@ func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	fmt.Fprintf(w, "%+v", post)
+	data := app.newPostTemplateData(r)
+	data.BlogPost = post
+	page := template.Pages.Post(*data)
+
+	w.Header().Set("Content-Type", "text/html")
+
+	base := template.Base(data.BlogPost.Title, false, page)
+	base.Render(context.Background(), w)
 }
 
 func (app *application) handleGetLatestBlogPosts(w http.ResponseWriter, r *http.Request) {

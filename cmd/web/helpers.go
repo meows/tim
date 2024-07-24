@@ -4,6 +4,9 @@ import (
 	"net/http"
 	"regexp"
 	"runtime/debug"
+	"time"
+
+	"github.com/timenglesf/personal-site/internal/shared"
 )
 
 func (app *application) serverError(w http.ResponseWriter, r *http.Request, err error) {
@@ -28,9 +31,8 @@ func isValidEmail(email string) bool {
 	return re.MatchString(email)
 }
 
-// func (app *application) newTemplateData(r *http.Request) *templateData {
-// 	return &templateData{
-// 		CurrentYear: time.Now().Year(),
-//
-// 	}
-// }
+func (app *application) newPostTemplateData(r *http.Request) *shared.PostTemplateData {
+	return &shared.PostTemplateData{
+		CurrentYear: time.Now().Year(),
+	}
+}

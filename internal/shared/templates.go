@@ -10,13 +10,6 @@ import (
 
 const DateLayout = "January 2, 2006"
 
-type adminTemplateData struct {
-	CurrentYear int
-	Blogs       any
-	Forms       any
-	Admin       models.User
-}
-
 type PostTemplateData struct {
 	CurrentYear int
 	// Posts       []models.Post
@@ -25,6 +18,13 @@ type PostTemplateData struct {
 	// Flash       string
 	// CSRFtoken   string
 	//  User        models.User
+}
+
+type AdminTemplateData struct {
+	CurrentYear int
+	Blogs       any
+	Forms       any
+	Admin       models.User
 }
 
 func Unsafe(html string) templ.Component {

@@ -13,7 +13,7 @@ import (
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	index := template.Pages.Index()
-	page := template.Base("Home", index)
+	page := template.Base("Home", false, index)
 	page.Render(context.Background(), w)
 }
 
@@ -23,7 +23,7 @@ func (app *application) handleDisplayAdminPage(w http.ResponseWriter, r *http.Re
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			signUpPage := template.Pages.SignUpAdmin()
-			page := template.Base("Admin Signup", signUpPage)
+			page := template.Base("Admin Signup", false, signUpPage)
 			page.Render(context.Background(), w)
 			return
 		}
