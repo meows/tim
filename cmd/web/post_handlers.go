@@ -10,9 +10,9 @@ import (
 )
 
 func (app *application) handleCreateBlogPost(w http.ResponseWriter, r *http.Request) {
-	title := "My very first blog post"
-	content := `<h1>Welcome to My Blog</h1>
-        <p>Hello, world! This is my first blog post. I'm excited to start sharing my thoughts and experiences with you. In this blog, I'll be covering a variety of topics, including technology, travel, and personal growth. Stay tuned for more updates, and thank you for joining me on this journey!</p>
+	title := "My second blog post"
+	content := `<h1>The Second Blog Post</h1>
+        <p>Hello, world! This is my second blog post. I'm excited to start sharing my thoughts and experiences with you. In this blog, I'll be covering a variety of topics, including technology, travel, and personal growth. Stay tuned for more updates, and thank you for joining me on this journey!</p>
         <p>Feel free to leave a comment or reach out to me through my social media channels. Let's connect and share our stories!</p>
         <footer>
             <p>Posted on July 21, 2024 by Author Name</p>
@@ -23,7 +23,7 @@ func (app *application) handleCreateBlogPost(w http.ResponseWriter, r *http.Requ
 		app.serverError(w, r, err)
 		return
 	}
-	http.Redirect(w, r, fmt.Sprintf("/post/%d", id), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/post/view/%d", id), http.StatusSeeOther)
 }
 
 func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request) {
@@ -44,4 +44,15 @@ func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request
 	}
 
 	fmt.Fprintf(w, "%+v", post)
+}
+
+func (app *application) handleGetLatestBlogPosts(w http.ResponseWriter, r *http.Request) {
+	posts, err := app.post.Latest(false)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+	for _, post := range posts {
+		fmt.Fprintf(w, "%+v\n", post)
+	}
 }
