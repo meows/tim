@@ -1,0 +1,13 @@
+package pages
+
+import (
+	"github.com/timenglesf/personal-site/internal/shared"
+)
+
+templ Post(pt shared.PostTemplateData) {
+	<h1 class="title">{ pt.BlogPost.Title }</h1>
+	<p class="date">{ pt.BlogPost.CreatedAt.Format(shared.DateLayout) }</p>
+	<div class="updated">
+		@shared.Unsafe(pt.BlogPost.Content)
+	</div>
+}

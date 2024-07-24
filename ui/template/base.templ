@@ -1,20 +1,19 @@
 package template
 
-templ Base(title string, component templ.Component) {
+import (
+	"github.com/timenglesf/personal-site/ui/template/partials"
+)
+
+templ Base(title string, isAdmin bool, page templ.Component) {
 	<html>
 		<head>
 			<title>{ title }</title>
 			<link rel="stylesheet" href="/static/dist/styles.css"/>
-			<script defer src="https://cdn.jsdelivr.net/npm/theme-change@2.0.2/index.js"></script>
+			// <script defer src="https://cdn.jsdelivr.net/npm/theme-change@2.0.2/index.js"></script>
 		</head>
 		<body>
-			@component
+			@partials.PageHeader(isAdmin)
+			@page
 		</body>
-		<script>
-      const toggleCheckbox = document.getElementById('theme-toggle');
-      toggleCheckbox.addEventListener('change', () => {
-        document.documentElement.classList.toggle('dark', toggleCheckbox.checked);
-      });
-    </script>
 	</html>
 }

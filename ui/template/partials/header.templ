@@ -1,8 +1,16 @@
 package partials
 
-templ PageHeader(themeToggle templ.Component) {
-	<header>
-		<h1>Page Header</h1>
-		@themeToggle
+templ PageHeader(isAdmin bool) {
+	<header class="flex">
+		<p>Tim's Page</p>
+		<nav class="flex">
+			<a href="/">Home</a>
+			<a href="/blog">Blog</a>
+			<a href="/about">About</a>
+			<a href="/contact">Contact</a>
+			if isAdmin {
+				<a href="/admin">Admin</a>
+			}
+		</nav>
 	</header>
 }
