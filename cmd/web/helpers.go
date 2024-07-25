@@ -36,3 +36,9 @@ func (app *application) newPostTemplateData(r *http.Request) *shared.PostTemplat
 		CurrentYear: time.Now().Year(),
 	}
 }
+
+func (app *application) newAdminTemplateData(r *http.Request) shared.AdminTemplateData {
+	return shared.AdminTemplateData{
+		CurrentYear: time.Now().Year(),
+	}
+}

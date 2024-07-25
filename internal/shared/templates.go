@@ -22,9 +22,19 @@ type PostTemplateData struct {
 
 type AdminTemplateData struct {
 	CurrentYear int
-	Blogs       any
-	Forms       any
-	Admin       models.User
+	BlogPost    models.Post
+	// Posts       []models.Post
+	Forms    any
+	Admin    models.User
+	Form     any
+	BlogForm BlogPostFormData
+}
+
+type BlogPostFormData struct {
+	Title       string
+	Content     string
+	FieldErrors map[string]string
+	// Tags
 }
 
 func Unsafe(html string) templ.Component {
