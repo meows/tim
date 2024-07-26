@@ -7,11 +7,10 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
-	"unicode/utf8"
 
 	"github.com/timenglesf/personal-site/internal/models"
 	"github.com/timenglesf/personal-site/internal/shared"
+	"github.com/timenglesf/personal-site/internal/validator"
 	"github.com/timenglesf/personal-site/ui/template"
 	"github.com/yuin/goldmark"
 )
@@ -39,23 +38,16 @@ func (app *application) handleCreateBlogPost(w http.ResponseWriter, r *http.Requ
 	}
 
 	form := shared.BlogPostFormData{
-		Title:       r.PostFormValue("title"),
-		Content:     r.PostFormValue("content"),
-		FieldErrors: make(map[string]string),
+		Title:   r.PostFormValue("title"),
+		Content: r.PostFormValue("content"),
 	}
 
 	// Validate form data
-	if strings.TrimSpace(form.Title) == "" {
-		form.FieldErrors["title"] = "Title is required"
-	} else if utf8.RuneCountInString(form.Title) > 100 {
-		form.FieldErrors["title"] = "Title must be less than 100 characters"
-	}
+	form.CheckField(validator.NotBlank(form.Title), "title", "Title is required")
+	form.CheckField(validator.MaxChars(form.Title, 100), "title", "This field is too long (maximum is 100 characters)")
+	form.CheckField(validator.NotBlank(form.Content), "content", "Content is required")
 
-	if strings.TrimSpace(form.Content) == "" {
-		form.FieldErrors["content"] = "Content is required"
-	}
-
-	if len(form.FieldErrors) > 0 {
+	if !form.Valid() {
 		fmt.Println("Form has errors")
 		fmt.Println(form.Content)
 		data := app.newAdminTemplateData(r)

@@ -6,6 +6,7 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/timenglesf/personal-site/internal/models"
+	"github.com/timenglesf/personal-site/internal/validator"
 )
 
 const DateLayout = "January 2, 2006"
@@ -31,9 +32,9 @@ type AdminTemplateData struct {
 }
 
 type BlogPostFormData struct {
-	Title       string
-	Content     string
-	FieldErrors map[string]string
+	Title   string
+	Content string
+	validator.Validator
 	// Tags
 }
 
