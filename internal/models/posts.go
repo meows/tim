@@ -3,7 +3,6 @@ package models
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"time"
 )
 
@@ -42,7 +41,6 @@ func (m *PostModel) Get(id int) (Post, error) {
 
 	err := m.DB.QueryRow(stmt, id).Scan(&p.ID, &p.Title, &p.Content, &p.Private, &p.CreatedAt, &p.UpdatedAt, &p.AuthorID)
 	if err != nil {
-		fmt.Println("ERROR: ", err)
 		if errors.Is(err, sql.ErrNoRows) {
 			return Post{}, ErrNoRecord
 		} else {
