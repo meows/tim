@@ -32,14 +32,12 @@ func (app *application) handleDisplayCreatePostForm(w http.ResponseWriter, r *ht
 
 // Saves a newly created blog to db and redirects to view the post
 func (app *application) handleCreateBlogPost(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
+	var form shared.BlogPostFormData
+
+	err := app.decodeForm(r, &form)
+	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
-	}
-
-	form := shared.BlogPostFormData{
-		Title:   r.PostFormValue("title"),
-		Content: r.PostFormValue("content"),
 	}
 
 	// Validate form data
@@ -48,8 +46,6 @@ func (app *application) handleCreateBlogPost(w http.ResponseWriter, r *http.Requ
 	form.CheckField(validator.NotBlank(form.Content), "content", "Content is required")
 
 	if !form.Valid() {
-		fmt.Println("Form has errors")
-		fmt.Println(form.Content)
 		data := app.newAdminTemplateData(r)
 		data.BlogForm = form
 		page := template.Pages.CreatePost(data)
@@ -64,6 +60,9 @@ func (app *application) handleCreateBlogPost(w http.ResponseWriter, r *http.Requ
 		app.serverError(w, r, err)
 		return
 	}
+
+	app.sessionManager.Put(r.Context(), "flash", "Post succesffully created!")
+
 	http.Redirect(w, r, fmt.Sprintf("/post/view/%d", id), http.StatusSeeOther)
 }
 
@@ -96,6 +95,11 @@ func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request
 	}
 
 	data.BlogPost.ContentHTML = buf.String()
+
+	// Get flash message from session
+	flash := app.sessionManager.PopString(r.Context(), "flash")
+	data.Flash = flash
+
 	page := template.Pages.Post(*data)
 
 	w.Header().Set("Content-Type", "text/html")

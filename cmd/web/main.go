@@ -10,6 +10,7 @@ import (
 
 	"github.com/alexedwards/scs/sqlite3store"
 	"github.com/alexedwards/scs/v2"
+	"github.com/go-playground/form/v4"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/timenglesf/personal-site/internal/models"
@@ -25,6 +26,7 @@ type application struct {
 	post           *models.PostModel
 	db             *sql.DB
 	sessionManager *scs.SessionManager
+	formDecoder    *form.Decoder
 }
 
 type config struct {
@@ -60,6 +62,9 @@ func main() {
 	sessionManager.Store = sqlite3store.New(db)
 	sessionManager.Lifetime = 24 * 7 * time.Hour
 
+	// Initialize form decoder
+	formDecoder := form.NewDecoder()
+
 	app := &application{
 		logger:         logger,
 		cfg:            &cfg,
@@ -68,6 +73,7 @@ func main() {
 		post:           &models.PostModel{DB: db},
 		db:             db,
 		sessionManager: sessionManager,
+		formDecoder:    formDecoder,
 	}
 
 	meta := models.Meta{

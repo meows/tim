@@ -1,11 +1,13 @@
 package main
 
 import (
+	"errors"
 	"net/http"
 	"regexp"
 	"runtime/debug"
 	"time"
 
+	"github.com/go-playground/form/v4"
 	"github.com/timenglesf/personal-site/internal/shared"
 )
 
@@ -41,4 +43,24 @@ func (app *application) newAdminTemplateData(r *http.Request) shared.AdminTempla
 	return shared.AdminTemplateData{
 		CurrentYear: time.Now().Year(),
 	}
+}
+
+// a helper function to decode form data into a struct using the automatic form decoder
+func (app *application) decodeForm(r *http.Request, dst any) error {
+	if err := r.ParseForm(); err != nil {
+		return err
+	}
+
+	err := app.formDecoder.Decode(&dst, r.PostForm)
+
+	var inValidDecoderError *form.InvalidDecoderError
+
+	if err != nil {
+		if errors.As(err, &inValidDecoderError) {
+			panic(err)
+		}
+		return err
+	}
+
+	return nil
 }

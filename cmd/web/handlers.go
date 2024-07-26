@@ -28,7 +28,6 @@ func (app *application) handleDisplayAdminPage(w http.ResponseWriter, r *http.Re
 			return
 		}
 		// TODO: Display an error message on the page using HTMX
-		fmt.Println("Error getting admin data")
 		app.serverError(w, r, err)
 	}
 	app.logger.Info("Admin data", "data", adminData)

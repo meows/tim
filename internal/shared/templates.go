@@ -16,7 +16,7 @@ type PostTemplateData struct {
 	// Posts       []models.Post
 	BlogPost models.Post
 	Form     any
-	// Flash       string
+	Flash    string
 	// CSRFtoken   string
 	//  User        models.User
 }
@@ -32,9 +32,9 @@ type AdminTemplateData struct {
 }
 
 type BlogPostFormData struct {
-	Title   string
-	Content string
-	validator.Validator
+	Title               string `form:"title"`
+	Content             string `form:"content"`
+	validator.Validator `form:"-"`
 	// Tags
 }
 
