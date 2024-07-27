@@ -113,6 +113,6 @@ func (app *application) handleAdminLoginPage(w http.ResponseWriter, r *http.Requ
 	fmt.Fprintln(w, "Admin login page")
 }
 
-func (app *application) handleAdmingLogoutPost(w http.ResponseWriter, r *http.Request) {
+func (app *application) handleAdminLogoutPost(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Admin logout POST")
 }

@@ -16,18 +16,18 @@ func (app *application) routes() http.Handler {
 	mux.Handle("GET /{$}", dynamic.ThenFunc(app.home))
 
 	// Posts
-	mux.Handle("GET /post/view/{id}", dynamic.ThenFunc(app.handleGetBlogPost))
-	mux.Handle("GET /post/create", dynamic.ThenFunc(app.handleDisplayCreatePostForm))
-	mux.Handle("POST /post/create", dynamic.ThenFunc(app.handleCreateBlogPost))
-	mux.Handle("GET /post/latest", dynamic.ThenFunc(app.handleGetLatestBlogPosts))
+	mux.Handle("GET /posts/view/{slug}", dynamic.ThenFunc(app.handleGetBlogPost))
+	mux.Handle("GET /posts/create", dynamic.ThenFunc(app.handleDisplayCreatePostForm))
+	mux.Handle("POST /posts/create", dynamic.ThenFunc(app.handleCreateBlogPost))
+	mux.Handle("GET /posts/latest", dynamic.ThenFunc(app.handleGetLatestBlogPosts))
 
 	// Admin routes
-	mux.Handle("GET /_", dynamic.ThenFunc(app.handleDisplayAdminPage))
-	mux.Handle("GET /_/signup", dynamic.ThenFunc(app.handleAdminSignupPage))
-	mux.Handle("POST /_/signup", dynamic.ThenFunc(app.handleAdminSignupPost))
-	mux.Handle("GET /_/login", dynamic.ThenFunc(app.handleAdminLoginPage))
-	mux.Handle("POST /_/login", dynamic.ThenFunc(app.handleAdminLoginPost))
-	mux.Handle("POST /_/logout", dynamic.ThenFunc(app.handleAdmingLogoutPost))
+	mux.Handle("GET /admin", dynamic.ThenFunc(app.handleDisplayAdminPage))
+	mux.Handle("GET /admin/signup", dynamic.ThenFunc(app.handleAdminSignupPage))
+	mux.Handle("POST /admin/signup", dynamic.ThenFunc(app.handleAdminSignupPost))
+	mux.Handle("GET /admin/login", dynamic.ThenFunc(app.handleAdminLoginPage))
+	mux.Handle("POST /admin/login", dynamic.ThenFunc(app.handleAdminLoginPost))
+	mux.Handle("POST /admin/logout", dynamic.ThenFunc(app.handleAdminLogoutPost))
 
 	standard := alice.New(app.recoverPanic, app.logRequest, commonHeaders)
 

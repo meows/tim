@@ -61,14 +61,14 @@ func (app *application) handleCreateBlogPost(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	app.sessionManager.Put(r.Context(), "flash", "Post succesffully created!")
+	app.sessionManager.Put(r.Context(), "flash", "Post succesfully created!")
 
 	http.Redirect(w, r, fmt.Sprintf("/post/view/%d", id), http.StatusSeeOther)
 }
 
 // View blog Post by ID
 func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.PathValue("id"))
+	id, err := strconv.Atoi(r.PathValue("slug"))
 	if err != nil || id < 1 {
 		http.NotFound(w, r)
 		return
