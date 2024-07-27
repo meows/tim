@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build:css": "tailwindcss -i ./ui/static/tailwind.css -o ./ui/static/dist/styles.css",
-    "watch:css": "tailwindcss -i ./ui/static/tailwind.css -o ./ui/static/dist/styles.css --watch"
+    "build:css": "tailwindcss -i ./ui/static/tailwind.css -o ./ui/static/dist/style/styles.css",
+    "watch:css": "tailwindcss -i ./ui/static/tailwind.css -o ./ui/static/dist/style/styles.css --watch"
   },
   "keywords": [],
   "author": "",

@@ -16,6 +16,9 @@ module.exports = {
     require('@tailwindcss/aspect-ratio'),
     require('daisyui'),
   ],
-  corePlugins: { preflight: true }
+  corePlugins: { preflight: true },
+  daisyui: {
+    themes: ["nord"],
+  },
 }
 
