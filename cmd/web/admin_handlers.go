@@ -4,11 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"net/http"
 
+	"github.com/timenglesf/personal-site/internal/models"
 	"github.com/timenglesf/personal-site/internal/shared"
 	"github.com/timenglesf/personal-site/internal/validator"
 	"github.com/timenglesf/personal-site/ui/template"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func (app *application) handleDisplayAdminPage(w http.ResponseWriter, r *http.Request) {
@@ -77,9 +80,27 @@ func (app *application) handleAdminSignupPost(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	// Hash password and save to database
+	// Hash password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(form.Password), 12)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
 
-	// Redirect to admin login page
+	id, err := app.user.Insert("Tim Engle", form.Email, string(hashedPassword), true)
+	if err != nil {
+		if errors.Is(err, models.ErrDuplicateAdmin) {
+			// TODO: Redirect to the admin login page and include a flash message on the sessionManager
+			app.clientError(w, http.StatusBadRequest)
+			return
+		}
+		app.serverError(w, r, err)
+		return
+	}
+
+	fmt.Println(id)
+
+	// TODO: Redirect to admin login page
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("Admin signup successful"))
 }

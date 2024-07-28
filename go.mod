@@ -13,4 +13,5 @@ require (
 	github.com/go-playground/form/v4 v4.2.1 // indirect
 	github.com/justinas/alice v1.2.0 // indirect
 	github.com/yuin/goldmark v1.7.4 // indirect
+	golang.org/x/crypto v0.25.0 // indirect
 )
