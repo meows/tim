@@ -9,9 +9,9 @@ import (
 
 type PagesStruct struct {
 	Index       func() templ.Component
-	SignUpAdmin func() templ.Component
-	Post        func(shared.PostTemplateData) templ.Component
-	CreatePost  func(shared.AdminTemplateData) templ.Component
+	SignUpAdmin func(data shared.AdminTemplateData) templ.Component
+	Post        func(data shared.PostTemplateData) templ.Component
+	CreatePost  func(data shared.AdminTemplateData) templ.Component
 }
 
 type PartialStruct struct {

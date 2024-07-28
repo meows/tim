@@ -12,23 +12,30 @@ import (
 const DateLayout = "January 2, 2006"
 
 type PostTemplateData struct {
-	CurrentYear int
 	// Posts       []models.Post
-	BlogPost models.Post
-	Form     any
-	Flash    string
+	BlogPost    models.Post
+	Flash       string
+	CurrentYear int
+	Form        any
 	// CSRFtoken   string
 	//  User        models.User
 }
 
 type AdminTemplateData struct {
-	CurrentYear int
 	BlogPost    models.Post
+	Admin       models.User
+	BlogForm    BlogPostFormData
+	SignUpForm  AdminSignUpForm
+	CurrentYear int
 	// Posts       []models.Post
-	Forms    any
-	Admin    models.User
-	Form     any
-	BlogForm BlogPostFormData
+}
+
+type AdminSignUpForm struct {
+	Email               string `form:"email"`
+	ConfirmEmail        string `form:"confirm_email"`
+	Password            string `form:"password"`
+	ConfirmPassword     string `form:"confirm_password"`
+	validator.Validator `form:"-"`
 }
 
 type BlogPostFormData struct {
