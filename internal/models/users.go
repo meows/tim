@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"errors"
 	"time"
 )
 
@@ -32,8 +33,31 @@ func (m *UserModel) GetAdmin() (*User, error) {
 	return &user, nil
 }
 
-func (m *UserModel) Insert(username, email, password string, isAdmin bool) error {
-	return nil
+func (m *UserModel) Insert(username, email, password string, isAdmin bool) (int, error) {
+	admin, err := m.GetAdmin()
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return 0, err
+		}
+	}
+
+	if isAdmin && admin != nil {
+		return 0, ErrDuplicateAdmin
+	}
+
+	stmt := `INSERT INTO users (username, email, password, is_admin, last_login) VALUES(?, ?, ?, ?, ?)`
+
+	result, err := m.DB.Exec(stmt, username, email, password, isAdmin, time.Now().UTC())
+	if err != nil {
+		return 0, err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(id), nil
 }
 
 func (m *UserModel) Authenticate(email, password string) (int, error) {
