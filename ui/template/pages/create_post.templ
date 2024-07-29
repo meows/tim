@@ -2,39 +2,68 @@ package pages
 
 import "github.com/timenglesf/personal-site/internal/shared"
 
+templ inputDisplay(val string) {
+	if val != "" {
+		<input class="input bg-neutral" id="title-input" type="text" name="title" value={ val }/>
+	} else {
+		<input class="input bg-neutral" id="title-input" type="text" name="title" placeholder="Title"/>
+	}
+}
+
+templ errorDisplay(val, id string) {
+	<div role="alert" class="alert alert-warning mb-6" id={ id }>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			class="h-6 w-6 shrink-0 stroke-current"
+			fill="none"
+			viewBox="0 0 24 24"
+		>
+			<path
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="2"
+				d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+			></path>
+		</svg>
+		<span>Warning: { val }</span>
+	</div>
+}
+
+templ labelDisplay(val string) {
+	<label class="text-lg" for="title">{ val }</label>
+}
+
 templ CreatePost(data shared.AdminTemplateData) {
-	<form action="/post/create" method="post">
-		<div class="flex flex-col justify-start">
-			<label for="title">Title:</label>
-			if data.BlogForm.FieldErrors["title"]!= "" {
-				<label class="text-red-500">{ data.BlogForm.FieldErrors["title"] }</label>
+	<main class="container mx-auto h-[calc(100vh-144px)]">
+		<div class="mx-auto w-2/3 h-full flex flex-col">
+			if data.BlogForm.FieldErrors["title"] != "" {
+				@errorDisplay(data.BlogForm.FieldErrors["title"], "title-warning")
 			}
-			if data.BlogForm.Title != "" {
-				<input id="title-input" type="text" name="title" value={ data.BlogForm.Title }/>
-			} else {
-				<input id="title-input" type="text" name="title" placeholder="Title"/>
+			if data.BlogForm.FieldErrors["content"] != "" && data.BlogForm.FieldErrors["title"] == "" {
+				@errorDisplay(data.BlogForm.FieldErrors["content"], "content-warning")
 			}
+			<form class="flex flex-col h-full" action="/posts/create" method="post">
+				<div class="flex flex-col justify-start mb-4">
+					@labelDisplay("Title:")
+					if data.BlogForm.Title != "" {
+						@inputDisplay(data.BlogForm.Title)
+					} else {
+						@inputDisplay("")
+					}
+				</div>
+				<div class="flex flex-col flex-grow justify-start mb-6 max-h-2/3-screen">
+					@labelDisplay("Content:")
+					if data.BlogForm.Content != "" {
+						<textarea class="textarea bg-neutral flex-grow max-h-2/3-screen" name="content">{ data.BlogForm.Content }</textarea>
+					} else {
+						<textarea class="textarea bg-neutral flex-grow max-h-2/3-screen" name="content" placeholder="Content"></textarea>
+					}
+				</div>
+				<div class="mt-4">
+					<button class="btn btn-primary" type="submit">Create Post</button>
+					<button class="btn btn-accent text-primary-content" type="button">Preview</button>
+				</div>
+			</form>
 		</div>
-		<div class="flex flex-col justify-start">
-			<label for="content">Content:</label>
-			if data.BlogForm.FieldErrors["content"]!= "" {
-				<label class="text-red-500">{ data.BlogForm.FieldErrors["content"] }</label>
-			}
-			if data.BlogForm.Content != "" {
-				<textarea type="textarea" name="content">{ data.BlogForm.Content }</textarea>
-			} else {
-				<textarea type="textarea" name="content" placeholder="Content"></textarea>
-			}
-		</div>
-		//	<div class="flex flex-col justify-start">
-		//		<label for="tags">
-		//			Tags (separated by commas):
-		//		</label>
-		//		<textarea id="tags" name="tags" rows="1" class="" placeholder="tags"></textarea>
-		//	</div>
-		<div>
-			<button type="submit">Create Post</button>
-			<button type="button">Preview</button>
-		</div>
-	</form>
+	</main>
 }
