@@ -18,18 +18,31 @@ func (app *application) handleDisplayAdminPage(w http.ResponseWriter, r *http.Re
 	// If there is no admin user in the database, display the admin signup page
 	adminData, err := app.user.GetAdmin()
 	if err != nil {
+		// Display the admin signup page
 		if errors.Is(err, sql.ErrNoRows) {
 			data := app.newAdminTemplateData(r)
-			signUpPage := template.Pages.SignUpAdmin(data)
-			page := template.Base("Admin Signup", false, signUpPage)
+			signUpPage := app.pageTemplates.AdminSignup(data)
+			page := app.pageTemplates.Base("Admin Signup", false, signUpPage)
 			page.Render(context.Background(), w)
 			return
 		}
+
+		// Handle other errors
 		// TODO: Display an error message on the page using HTMX
 		app.serverError(w, r, err)
 	}
+
+	//// TEMPORARY
+
+	data := app.newAdminTemplateData(r)
+	signUpPage := app.pageTemplates.AdminSignup(data)
+	page := app.pageTemplates.Base("Admin Signup", false, signUpPage)
+	page.Render(context.Background(), w)
+	return
+
+	///////////////
 	app.logger.Info("Admin data", "data", adminData)
-	// TODO: Display login page if not admin
+	// TODO: Display login page if not admin with toast message because there is an admin
 	w.Write([]byte("Display the login page if not admin"))
 	// TODO: Display admin dashboard if logged in as admin
 
@@ -40,11 +53,15 @@ func (app *application) handleAdminSignupPost(w http.ResponseWriter, r *http.Req
 	// Get an admin if one exists
 	adminData, err := app.user.GetAdmin()
 	if err != nil {
+		// If the error is not a no rows request than this error is unexpected
 		if !errors.Is(err, sql.ErrNoRows) {
 			// TODO: Redirect to admin login page
 			app.clientError(w, http.StatusBadRequest)
+			return
 		}
 	}
+
+	// If an admin already exists, redirect
 	if adminData != nil {
 		// TODO: Redirect to admin login page
 		w.Write([]byte("Admin already exists"))
@@ -73,8 +90,8 @@ func (app *application) handleAdminSignupPost(w http.ResponseWriter, r *http.Req
 	if !form.Valid() {
 		data := app.newAdminTemplateData(r)
 		data.SignUpForm = form
-		page := template.Pages.SignUpAdmin(data)
-		base := template.Base("Admin Signup", false, page)
+		page := app.pageTemplates.AdminSignup(data)
+		base := app.pageTemplates.Base("Admin Signup", false, page)
 		w.WriteHeader(http.StatusUnprocessableEntity)
 		base.Render(context.Background(), w)
 		return
@@ -103,4 +120,45 @@ func (app *application) handleAdminSignupPost(w http.ResponseWriter, r *http.Req
 	// TODO: Redirect to admin login page
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("Admin signup successful"))
+}
+
+func (app *application) handleAdminLoginPage(w http.ResponseWriter, r *http.Request) {
+	data := app.newAdminTemplateData(r)
+	fmt.Printf("%+v \n", data)
+	fmt.Printf("BlogPost: %+v\n", data.BlogPost)
+	fmt.Printf("Admin: %+v\n", data.Admin)
+	fmt.Printf("BlogForm: %+v\n", data.BlogForm)
+	fmt.Printf("SignUpForm: %+v\n", data.SignUpForm)
+	fmt.Printf("LoginForm: %+v\n", data.LoginForm)
+	page := app.pageTemplates.AdminLogin(data)
+	base := app.pageTemplates.Base("Admin Login", false, page)
+	base.Render(context.Background(), w)
+}
+
+func (app *application) handleAdminLoginPost(w http.ResponseWriter, r *http.Request) {
+	var form shared.AdminLoginForm
+
+	err := app.decodeForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	fmt.Println(form.Email)
+	fmt.Println(form.Password)
+
+	form.CheckField(validator.NotBlank(form.Email), "email", "Email is required")
+	form.CheckField(validator.ValidEmail(form.Email), "email", "Invalid email format")
+	form.CheckField(validator.MaxChars(form.Email, 100), "email", "Email is too long (maximum is 100 characters)")
+	form.CheckField(validator.NotBlank(form.Password), "password", "Password is required")
+
+	if !form.Valid() {
+		data := app.newAdminTemplateData(r)
+		data.LoginForm = form
+		page := app.pageTemplates.AdminLogin(data)
+		base := template.Base("Admin Login", false, page)
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		base.Render(context.Background(), w)
+		return
+	}
 }

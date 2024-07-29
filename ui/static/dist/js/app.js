@@ -4,10 +4,42 @@ document.documentElement.setAttribute('data-theme', 'mytheme');
 
 
 document.addEventListener('DOMContentLoaded', function() {
-  const titleInput = document.getElementById('title-input');
+  // Post form validation
+  const titleInput = document.getElementById('title_input');
   const contentInput = document.querySelector("textarea")
-  const titleWarning = document.getElementById('title-warning');
-  const contentWarning = document.getElementById('content-warning');
+  const titleWarning = document.getElementById('title_warning');
+  const contentWarning = document.getElementById('content_warning');
+
+  if (titleWarning) {
+    console.log(titleInput)
+    titleInput.focus()
+  }
+
+  if (contentWarning) {
+    contentInput.focus();
+  }
+
+  // Sign up / Log in form validation
+
+  const emailInput = document.getElementById('email');
+  const emailConfirmInput = document.getElementById('confirm_email');
+  const passwordInput = document.getElementById('password');
+  const passwordConfirmInput = document.getElementById('confirm_password');
+  const emailWarning = document.getElementById('email_warning');
+  const emailConfirmWarning = document.getElementById('confirm_email_warning');
+  const passwordWarning = document.getElementById('password_warning');
+  const passwordConfirmWarning = document.getElementById('confirm_password_warning');
+
+
+  if (emailWarning) {
+    emailInput.focus();
+  } else if (emailConfirmWarning) {
+    emailConfirmInput.focus();
+  } else if (passwordWarning) {
+    passwordInput.focus();
+  } else if (passwordConfirmWarning) {
+    passwordConfirmInput.focus();
+  }
 
   // Prevent form submission on Enter key for title input
   if (titleInput) {
@@ -19,14 +51,6 @@ document.addEventListener('DOMContentLoaded', function() {
     })
   }
 
-  if (titleWarning) {
-    console.log(titleInput)
-    titleInput.focus()
-  }
-
-  if (contentWarning) {
-    contentInput.focus();
-  }
 });
 
 
