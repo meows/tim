@@ -14,6 +14,7 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/timenglesf/personal-site/internal/models"
+	"github.com/timenglesf/personal-site/ui/template"
 )
 
 var version = "1.0.0"
@@ -27,6 +28,7 @@ type application struct {
 	db             *sql.DB
 	sessionManager *scs.SessionManager
 	formDecoder    *form.Decoder
+	pageTemplates  *template.Pages
 }
 
 type config struct {
@@ -65,6 +67,10 @@ func main() {
 	// Initialize form decoder
 	formDecoder := form.NewDecoder()
 
+	// Initialize page templates
+	pageTemplates := template.CreatePageTemplates()
+	// Initialize partial templates
+
 	app := &application{
 		logger:         logger,
 		cfg:            &cfg,
@@ -74,6 +80,7 @@ func main() {
 		db:             db,
 		sessionManager: sessionManager,
 		formDecoder:    formDecoder,
+		pageTemplates:  pageTemplates,
 	}
 
 	meta := models.Meta{

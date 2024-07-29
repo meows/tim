@@ -21,7 +21,7 @@ import (
 func (app *application) handleDisplayCreatePostForm(w http.ResponseWriter, r *http.Request) {
 	// TODO: Make sure user is logged in and is an admin
 
-	page := template.Pages.CreatePost(shared.AdminTemplateData{})
+	page := app.pageTemplates.CreatePost(shared.AdminTemplateData{})
 	w.Header().Set("Content-Type", "text/html")
 	base := template.Base("Create Post", true, page)
 	if err := base.Render(context.Background(), w); err != nil {
@@ -48,8 +48,8 @@ func (app *application) handleCreateBlogPost(w http.ResponseWriter, r *http.Requ
 	if !form.Valid() {
 		data := app.newAdminTemplateData(r)
 		data.BlogForm = form
-		page := template.Pages.CreatePost(data)
-		base := template.Base("Create Post", true, page)
+		page := app.pageTemplates.CreatePost(data)
+		base := app.pageTemplates.Base("Create Post", true, page)
 		w.WriteHeader(http.StatusUnprocessableEntity)
 		base.Render(context.Background(), w)
 		return
@@ -100,7 +100,7 @@ func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request
 	flash := app.sessionManager.PopString(r.Context(), "flash")
 	data.Flash = flash
 
-	page := template.Pages.Post(*data)
+	page := app.pageTemplates.Post(*data)
 
 	w.Header().Set("Content-Type", "text/html")
 

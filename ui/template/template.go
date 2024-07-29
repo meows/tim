@@ -7,27 +7,35 @@ import (
 	"github.com/timenglesf/personal-site/ui/template/partials"
 )
 
-type PagesStruct struct {
+type Pages struct {
+	Base        func(title string, isAdmin bool, page templ.Component) templ.Component
 	Index       func() templ.Component
-	SignUpAdmin func(data shared.AdminTemplateData) templ.Component
+	AdminSignup func(data shared.AdminTemplateData) templ.Component
 	Post        func(data shared.PostTemplateData) templ.Component
 	CreatePost  func(data shared.AdminTemplateData) templ.Component
+	AdminLogin  func(data shared.AdminTemplateData) templ.Component
 }
 
-type PartialStruct struct {
+type Partials struct {
 	PageHeader  func(isAdmin bool) templ.Component
 	ThemeToggle func() templ.Component
+	// Footer      func() templ.Component
 }
 
-// TODO: Put these on the app struct
-var Pages = PagesStruct{
-	Index:       pages.Index,
-	SignUpAdmin: pages.SignUpAdmin,
-	Post:        pages.Post,
-	CreatePost:  pages.CreatePost,
+func CreatePageTemplates() *Pages {
+	return &Pages{
+		Base:        Base,
+		Index:       pages.Index,
+		AdminSignup: pages.SignUpAdmin,
+		Post:        pages.Post,
+		CreatePost:  pages.CreatePost,
+	}
 }
 
-var Partials = PartialStruct{
-	PageHeader:  partials.PageHeader,
-	ThemeToggle: partials.ThemeToggle,
+func CreatePartialTemplates() *Partials {
+	return &Partials{
+		PageHeader:  partials.PageHeader,
+		ThemeToggle: partials.ThemeToggle,
+		//  Footer:      partials.Footer,
+	}
 }
