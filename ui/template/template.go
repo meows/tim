@@ -19,6 +19,7 @@ type PartialStruct struct {
 	ThemeToggle func() templ.Component
 }
 
+// TODO: Put these on the app struct
 var Pages = PagesStruct{
 	Index:       pages.Index,
 	SignUpAdmin: pages.SignUpAdmin,

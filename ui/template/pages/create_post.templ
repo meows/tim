@@ -1,33 +1,9 @@
 package pages
 
-import "github.com/timenglesf/personal-site/internal/shared"
-
-templ inputDisplay(val string) {
-	if val != "" {
-		<input class="input bg-neutral" id="title-input" type="text" name="title" value={ val }/>
-	} else {
-		<input class="input bg-neutral" id="title-input" type="text" name="title" placeholder="Title"/>
-	}
-}
-
-templ errorDisplay(val, id string) {
-	<div role="alert" class="alert alert-warning mb-6" id={ id }>
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			class="h-6 w-6 shrink-0 stroke-current"
-			fill="none"
-			viewBox="0 0 24 24"
-		>
-			<path
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				stroke-width="2"
-				d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-			></path>
-		</svg>
-		<span>Warning: { val }</span>
-	</div>
-}
+import (
+	"github.com/timenglesf/personal-site/internal/shared"
+	"github.com/timenglesf/personal-site/ui/template/components"
+)
 
 templ labelDisplay(val string) {
 	<label class="text-lg" for="title">{ val }</label>
@@ -37,27 +13,19 @@ templ CreatePost(data shared.AdminTemplateData) {
 	<main class="container mx-auto h-[calc(100vh-144px)]">
 		<div class="mx-auto w-2/3 h-full flex flex-col">
 			if data.BlogForm.FieldErrors["title"] != "" {
-				@errorDisplay(data.BlogForm.FieldErrors["title"], "title-warning")
+				@components.WarningDisplay(data.BlogForm.FieldErrors["title"], "title-warning", "mb-6")
 			}
 			if data.BlogForm.FieldErrors["content"] != "" && data.BlogForm.FieldErrors["title"] == "" {
-				@errorDisplay(data.BlogForm.FieldErrors["content"], "content-warning")
+				@components.WarningDisplay(data.BlogForm.FieldErrors["content"], "content-warning", "mb-6")
 			}
 			<form class="flex flex-col h-full" action="/posts/create" method="post">
 				<div class="flex flex-col justify-start mb-4">
 					@labelDisplay("Title:")
-					if data.BlogForm.Title != "" {
-						@inputDisplay(data.BlogForm.Title)
-					} else {
-						@inputDisplay("")
-					}
+					@components.TitleInputDisplay(data.BlogForm.Title)
 				</div>
 				<div class="flex flex-col flex-grow justify-start mb-6 max-h-2/3-screen">
 					@labelDisplay("Content:")
-					if data.BlogForm.Content != "" {
-						<textarea class="textarea bg-neutral flex-grow max-h-2/3-screen" name="content">{ data.BlogForm.Content }</textarea>
-					} else {
-						<textarea class="textarea bg-neutral flex-grow max-h-2/3-screen" name="content" placeholder="Content"></textarea>
-					}
+					@components.TextAreaInputDisplay(data.BlogForm.Content)
 				</div>
 				<div class="mt-4">
 					<button class="btn btn-primary" type="submit">Create Post</button>
