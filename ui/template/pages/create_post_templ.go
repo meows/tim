@@ -70,13 +70,13 @@ func CreatePost(data shared.AdminTemplateData) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if data.BlogForm.FieldErrors["title"] != "" {
-			templ_7745c5c3_Err = components.WarningDisplay(data.BlogForm.FieldErrors["title"], "title-warning", "mb-6").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = components.WarningAlert(data.BlogForm.FieldErrors["title"], "title_warning", "mb-6").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
 		if data.BlogForm.FieldErrors["content"] != "" && data.BlogForm.FieldErrors["title"] == "" {
-			templ_7745c5c3_Err = components.WarningDisplay(data.BlogForm.FieldErrors["content"], "content-warning", "mb-6").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = components.WarningAlert(data.BlogForm.FieldErrors["content"], "content_warning", "mb-6").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

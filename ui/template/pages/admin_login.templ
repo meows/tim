@@ -5,16 +5,26 @@ import (
 	"github.com/timenglesf/personal-site/ui/template/components"
 )
 
-templ AdminLogin(data shared.AdminTemplateData) {
+templ AdminLogin(data *shared.AdminTemplateData) {
 	<main class="container mx-auto">
 		<div class="mx-auto w-1/2 max-w-2xl">
 			<form action="/admin/login" method="post" class="">
+				if data.Flash.Message != "" {
+					switch data.Flash.Type {
+						case "error":
+							@components.ErrorAlert(data.Flash.Message, "", "mb-6")
+						case "warning":
+							@components.WarningAlert(data.Flash.Message, "", "mb-6")
+						case "success":
+							@components.SuccessAlert(data.Flash.Message, "", "mb-6")
+					}
+				}
 				if data.LoginForm.FieldErrors["email"] != "" {
-					@components.WarningDisplay(data.LoginForm.FieldErrors["email"], "email_warning", "mb-6")
+					@components.WarningAlert(data.LoginForm.FieldErrors["email"], "email_warning", "mb-6")
 				} else if data.LoginForm.FieldErrors["password"] != "" {
-					@components.WarningDisplay(data.LoginForm.FieldErrors["password"], "password_warning", "mb-6")
+					@components.WarningAlert(data.LoginForm.FieldErrors["password"], "password_warning", "mb-6")
 				} else if data.LoginForm.FieldErrors["badCredentials"] != "" {
-					@components.WarningDisplay("Invalid email or password", "email", "mb-6")
+					@components.WarningAlert("Invalid email or password", "email", "mb-6")
 				}
 				<div class="flex flex-col gap-2 mb-6">
 					// Email input

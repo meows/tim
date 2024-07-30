@@ -1,6 +1,6 @@
 package components
 
-templ WarningDisplay(message, id, tw_classes string) {
+templ WarningAlert(message, id, tw_classes string) {
 	<div role="alert" class={ "alert alert-warning " + tw_classes } id={ id }>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -19,7 +19,7 @@ templ WarningDisplay(message, id, tw_classes string) {
 	</div>
 }
 
-templ ErrorDisplay(message, id, tw_classes string) {
+templ ErrorAlert(message, id, tw_classes string) {
 	<div role="alert" class={ "alert alert-error " + tw_classes } id={ id }>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -35,5 +35,24 @@ templ ErrorDisplay(message, id, tw_classes string) {
 			></path>
 		</svg>
 		<span>Error: { message }</span>
+	</div>
+}
+
+templ SuccessAlert(message, id, tw_classes string) {
+	<div role="alert" class={ "alert alert-success " + tw_classes } id={ id }>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			class="h-6 w-6 shrink-0 stroke-current"
+			fill="none"
+			viewBox="0 0 24 24"
+		>
+			<path
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="2"
+				d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+			></path>
+		</svg>
+		<span>Success: { message }</span>
 	</div>
 }
