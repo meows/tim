@@ -3,7 +3,10 @@ package models
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -27,6 +30,9 @@ func (m *UserModel) GetAdmin() (*User, error) {
 
 	err := m.DB.QueryRow(query).Scan(&user.ID, &user.Username, &user.Password, &user.Email, &user.IsAdmin, &user.CreatedAt, &user.LastLogin)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNoRecord
+		}
 		return nil, err
 	}
 
@@ -36,8 +42,9 @@ func (m *UserModel) GetAdmin() (*User, error) {
 func (m *UserModel) Insert(username, email, password string, isAdmin bool) (int, error) {
 	admin, err := m.GetAdmin()
 	if err != nil {
-		if !errors.Is(err, sql.ErrNoRows) {
-			return 0, err
+		fmt.Println(err, "here is error")
+		if !errors.Is(err, ErrNoRecord) {
+			return 0, ErrNoRecord
 		}
 	}
 
@@ -60,7 +67,44 @@ func (m *UserModel) Insert(username, email, password string, isAdmin bool) (int,
 	return int(id), nil
 }
 
+func (m *UserModel) GetByEmail(email string) (*User, error) {
+	var user User
+	query := `SELECT * FROM users WHERE email = ?`
+	err := m.DB.QueryRow(query, email).Scan(&user.ID, &user.Username, &user.Password, &user.Email, &user.IsAdmin, &user.CreatedAt, &user.LastLogin)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNoRecord
+		}
+		return nil, err
+	}
+
+	return &user, nil
+}
+
 func (m *UserModel) Authenticate(email, password string) (int, error) {
+	var id int
+	var hashedPassword []byte
+
+	stmt := `SELECT id, password FROM users WHERE email = ?`
+
+	err := m.DB.QueryRow(stmt, email).Scan(&id, &hashedPassword)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, ErrInvalidCredentials
+		} else {
+			return 0, err
+		}
+	}
+
+	err = bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
+	if err != nil {
+		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+			return 0, ErrInvalidCredentials
+		} else {
+			return 0, err
+		}
+	}
+
 	return 0, nil
 }
 

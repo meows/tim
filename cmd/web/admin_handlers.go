@@ -1,8 +1,6 @@
 package main
 
 import (
-	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"net/http"
@@ -10,67 +8,42 @@ import (
 	"github.com/timenglesf/personal-site/internal/models"
 	"github.com/timenglesf/personal-site/internal/shared"
 	"github.com/timenglesf/personal-site/internal/validator"
-	"github.com/timenglesf/personal-site/ui/template"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func (app *application) handleDisplayAdminPage(w http.ResponseWriter, r *http.Request) {
 	// If there is no admin user in the database, display the admin signup page
-	adminData, err := app.user.GetAdmin()
+	_, err := app.user.GetAdmin()
 	if err != nil {
 		// Display the admin signup page
-		if errors.Is(err, sql.ErrNoRows) {
-			data := app.newAdminTemplateData(r)
-			signUpPage := app.pageTemplates.AdminSignup(data)
-			page := app.pageTemplates.Base("Admin Signup", false, signUpPage)
-			page.Render(context.Background(), w)
+		if errors.Is(err, models.ErrNoRecord) {
+			data := app.newTemplateData(r)
+			app.renderAdminPage(w, r, app.pageTemplates.AdminSignup, "Admin Sign Up", &data)
 			return
-		}
 
+		}
 		// Handle other errors
 		// TODO: Display an error message on the page using HTMX
 		app.serverError(w, r, err)
 	}
 
-	//// TEMPORARY
+	// display admin login page
+	data := app.newTemplateData(r)
+	app.renderAdminPage(w, r, app.pageTemplates.AdminLogin, "Admin Login", &data)
 
-	data := app.newAdminTemplateData(r)
-	signUpPage := app.pageTemplates.AdminSignup(data)
-	page := app.pageTemplates.Base("Admin Signup", false, signUpPage)
-	page.Render(context.Background(), w)
-	return
+	// TODO: Display admin dashboard if logged in
+}
 
-	///////////////
-	app.logger.Info("Admin data", "data", adminData)
-	// TODO: Display login page if not admin with toast message because there is an admin
-	w.Write([]byte("Display the login page if not admin"))
-	// TODO: Display admin dashboard if logged in as admin
-
-	// Else display admin dashboard
+func (app *application) handleAdminSignupPage(w http.ResponseWriter, r *http.Request) {
+	data := app.newTemplateData(r)
+	app.renderAdminPage(w, r, app.pageTemplates.AdminSignup, "Admin Sign Up", &data)
 }
 
 func (app *application) handleAdminSignupPost(w http.ResponseWriter, r *http.Request) {
-	// Get an admin if one exists
-	adminData, err := app.user.GetAdmin()
-	if err != nil {
-		// If the error is not a no rows request than this error is unexpected
-		if !errors.Is(err, sql.ErrNoRows) {
-			// TODO: Redirect to admin login page
-			app.clientError(w, http.StatusBadRequest)
-			return
-		}
-	}
-
-	// If an admin already exists, redirect
-	if adminData != nil {
-		// TODO: Redirect to admin login page
-		w.Write([]byte("Admin already exists"))
-	}
-
 	// parse and validate form
 	var form shared.AdminSignUpForm
 
-	err = app.decodeForm(r, &form)
+	err := app.decodeForm(r, &form)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
@@ -81,19 +54,22 @@ func (app *application) handleAdminSignupPost(w http.ResponseWriter, r *http.Req
 	form.CheckField(validator.MaxChars(form.Email, 100), "email", "Email is too long (maximum is 100 characters)")
 	form.CheckField(validator.NotBlank(form.ConfirmEmail), "confirm_email", "Confirm Email is required")
 	form.CheckField(validator.EqualStrings(form.Email, form.ConfirmEmail), "confirm_email", "Emails do not match")
+
+	form.CheckField(validator.NotBlank(form.DisplayName), "display_name", "Name is required")
+	form.CheckField(validator.MaxChars(form.DisplayName, 50), "display_name", "Name is too long (maximum is 50 characters)")
+	form.CheckField(validator.MinChars(form.DisplayName, 2), "display_name", "Name is too short (minimum is 2 characters)")
+
 	form.CheckField(validator.NotBlank(form.Password), "password", "Password is required")
 	form.CheckField(validator.MinChars(form.Password, 8), "password", "Password must be at least 8 characters long")
 	form.CheckField(validator.MaxChars(form.Password, 100), "password", "Password is too long (maximum is 100 characters)")
 	form.CheckField(validator.NotBlank(form.ConfirmPassword), "confirm_password", "Confirm Password is required")
 	form.CheckField(validator.EqualStrings(form.Password, form.ConfirmPassword), "confirm_password", "Passwords do not match")
 
+	data := app.newTemplateData(r)
+	data.SignUpForm = form
+
 	if !form.Valid() {
-		data := app.newAdminTemplateData(r)
-		data.SignUpForm = form
-		page := app.pageTemplates.AdminSignup(data)
-		base := app.pageTemplates.Base("Admin Signup", false, page)
-		w.WriteHeader(http.StatusUnprocessableEntity)
-		base.Render(context.Background(), w)
+		app.renderAdminPage(w, r, app.pageTemplates.AdminSignup, "Admin Signup", &data)
 		return
 	}
 
@@ -104,35 +80,65 @@ func (app *application) handleAdminSignupPost(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	id, err := app.user.Insert("Tim Engle", form.Email, string(hashedPassword), true)
+	// Get an admin if one exists
+	adminData, err := app.user.GetAdmin()
 	if err != nil {
-		if errors.Is(err, models.ErrDuplicateAdmin) {
-			// TODO: Redirect to the admin login page and include a flash message on the sessionManager
-			app.clientError(w, http.StatusBadRequest)
+		// If the error is not a no rows request than this error is unexpected
+		if !errors.Is(err, models.ErrNoRecord) {
+			app.serverError(w, r, err)
 			return
 		}
-		app.serverError(w, r, err)
+	}
+
+	// If an admin already exists, redirect
+	if adminData != nil {
+		app.sessionManager.Put(r.Context(), "flashError", "Creating admin")
+		http.Redirect(w, r, "/admin/login", http.StatusSeeOther)
 		return
+	}
+
+	id, err := app.user.Insert(form.DisplayName, form.Email, string(hashedPassword), true)
+
+	fmt.Println("id: ", id)
+	if err != nil {
+		if errors.Is(err, models.ErrDuplicateAdmin) {
+			app.sessionManager.Put(r.Context(), "flashError", "Creating admin")
+			http.Redirect(w, r, "/admin/login", http.StatusSeeOther)
+			return
+		}
+		// If there is no record we want to continue and create one
+		if !errors.Is(err, models.ErrNoRecord) {
+			app.serverError(w, r, err)
+			return
+		}
 	}
 
 	fmt.Println(id)
 
-	// TODO: Redirect to admin login page
-	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("Admin signup successful"))
+	app.sessionManager.Put(r.Context(), "flashSuccess", "Admin account created successfully")
+	http.Redirect(w, r, "/admin/login", http.StatusSeeOther)
 }
 
 func (app *application) handleAdminLoginPage(w http.ResponseWriter, r *http.Request) {
-	data := app.newAdminTemplateData(r)
-	fmt.Printf("%+v \n", data)
-	fmt.Printf("BlogPost: %+v\n", data.BlogPost)
-	fmt.Printf("Admin: %+v\n", data.Admin)
-	fmt.Printf("BlogForm: %+v\n", data.BlogForm)
-	fmt.Printf("SignUpForm: %+v\n", data.SignUpForm)
-	fmt.Printf("LoginForm: %+v\n", data.LoginForm)
-	page := app.pageTemplates.AdminLogin(data)
-	base := app.pageTemplates.Base("Admin Login", false, page)
-	base.Render(context.Background(), w)
+	data := app.newTemplateData(r)
+
+	flashSuccess := app.sessionManager.PopString(r.Context(), "flashSuccess")
+	if flashSuccess != "" {
+		data.Flash = shared.FlashMessage{Message: flashSuccess, Type: "success"}
+	}
+
+	flashError := app.sessionManager.PopString(r.Context(), "flashError")
+	if flashError != "" {
+		data.Flash = shared.FlashMessage{Message: flashError, Type: "error"}
+	}
+
+	app.renderAdminPage(w, r, app.pageTemplates.AdminLogin, "Admin Login", &data)
+}
+
+func displayAdminLoginWithInvalidCredAlert(app *application, w http.ResponseWriter, r *http.Request, data *shared.TemplateData) {
+	data.Flash = shared.FlashMessage{Message: "Email or Password Incorrect", Type: "warning"}
+	w.WriteHeader(http.StatusUnprocessableEntity)
+	app.renderAdminPage(w, r, app.pageTemplates.AdminLogin, "Admin Login", data)
 }
 
 func (app *application) handleAdminLoginPost(w http.ResponseWriter, r *http.Request) {
@@ -150,15 +156,68 @@ func (app *application) handleAdminLoginPost(w http.ResponseWriter, r *http.Requ
 	form.CheckField(validator.NotBlank(form.Email), "email", "Email is required")
 	form.CheckField(validator.ValidEmail(form.Email), "email", "Invalid email format")
 	form.CheckField(validator.MaxChars(form.Email, 100), "email", "Email is too long (maximum is 100 characters)")
+
 	form.CheckField(validator.NotBlank(form.Password), "password", "Password is required")
+	form.CheckField(validator.MinChars(form.Password, 8), "password", "Password must be at least 8 characters long")
+	form.CheckField(validator.MaxChars(form.Password, 100), "password", "Password is too long (maximum is 100 characters)")
 
 	if !form.Valid() {
-		data := app.newAdminTemplateData(r)
+		data := app.newTemplateData(r)
 		data.LoginForm = form
-		page := app.pageTemplates.AdminLogin(data)
-		base := template.Base("Admin Login", false, page)
-		w.WriteHeader(http.StatusUnprocessableEntity)
-		base.Render(context.Background(), w)
+		app.renderAdminPage(w, r, app.pageTemplates.AdminLogin, "Admin Login", &data)
 		return
 	}
+
+	admin, err := app.user.GetAdmin()
+	fmt.Print(admin)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			data := app.newTemplateData(r)
+			data.Flash = shared.FlashMessage{Message: "Admin does not exist", Type: "warning"}
+			w.WriteHeader(http.StatusUnprocessableEntity)
+			app.renderAdminPage(w, r, app.pageTemplates.AdminSignup, "Sign Up", &data)
+			return
+		}
+	}
+
+	data := app.newTemplateData(r)
+	data.LoginForm = form
+
+	targetUser, err := app.user.GetByEmail(form.Email)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			displayAdminLoginWithInvalidCredAlert(app, w, r, &data)
+			return
+		}
+	}
+
+	// check if targetUser is equal to the admin
+	if targetUser.ID != admin.ID {
+		displayAdminLoginWithInvalidCredAlert(app, w, r, &data)
+		return
+	}
+
+	if err = bcrypt.CompareHashAndPassword([]byte(targetUser.Password), []byte(form.Password)); err != nil {
+		displayAdminLoginWithInvalidCredAlert(app, w, r, &data)
+		return
+	}
+
+	if err = app.sessionManager.RenewToken(r.Context()); err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	app.sessionManager.Put(r.Context(), "authenticatedUserID", targetUser.ID)
+	app.sessionManager.Put(r.Context(), "isAdminRole", true)
+}
+
+func (app *application) handleAdminLogoutPost(w http.ResponseWriter, r *http.Request) {
+	if err := app.sessionManager.RenewToken(r.Context()); err != nil {
+		app.serverError(w, r, err)
+	}
+
+	app.sessionManager.Remove(r.Context(), "authenticatedUserID")
+	app.sessionManager.Remove(r.Context(), "isAdminRole")
+
+	http.Redirect(w, r, "/admin/login", http.StatusSeeOther)
 }

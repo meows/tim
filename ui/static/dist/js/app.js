@@ -23,6 +23,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const emailInput = document.getElementById('email');
   const emailConfirmInput = document.getElementById('confirm_email');
+  const displayNameInput = document.getElementById('display_name');
+  const displayNameWarning = document.getElementById('display_name_warning');
   const passwordInput = document.getElementById('password');
   const passwordConfirmInput = document.getElementById('confirm_password');
   const emailWarning = document.getElementById('email_warning');
@@ -35,10 +37,12 @@ document.addEventListener('DOMContentLoaded', function() {
     emailInput.focus();
   } else if (emailConfirmWarning) {
     emailConfirmInput.focus();
+  } else if (displayNameWarning) {
+    displayNameInput.focus();
   } else if (passwordWarning) {
     passwordInput.focus();
   } else if (passwordConfirmWarning) {
-    passwordConfirmInput.focus();
+    passwordInput.focus();
   }
 
   // Prevent form submission on Enter key for title input
