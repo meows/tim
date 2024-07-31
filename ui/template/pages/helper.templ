@@ -1,0 +1,20 @@
+
+package pages
+
+import (
+	"github.com/a-h/templ"
+	"github.com/timenglesf/personal-site/internal/shared"
+	"github.com/timenglesf/personal-site/ui/template/components"
+)
+
+func DisplayFlashAlert(flashMsg shared.FlashMessage) templ.Component {
+	switch flashMsg.Type {
+	case "success":
+		return components.SuccessAlert(flashMsg.Message, "success_alert", "mb-6")
+	case "warning":
+		return components.WarningAlert(flashMsg.Message, "warning_alert", "mb-6")
+	case "error":
+		return components.ErrorAlert(flashMsg.Message, "error_alert", "mb-6")
+	}
+	return nil
+}

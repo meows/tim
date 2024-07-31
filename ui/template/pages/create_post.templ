@@ -9,7 +9,7 @@ templ labelDisplay(val string) {
 	<label class="text-lg" for="title">{ val }</label>
 }
 
-templ CreatePost(data shared.AdminTemplateData) {
+templ CreatePost(data *shared.TemplateData) {
 	<main class="container mx-auto h-[calc(100vh-144px)]">
 		<div class="mx-auto w-2/3 h-full flex flex-col">
 			if data.BlogForm.FieldErrors["title"] != "" {

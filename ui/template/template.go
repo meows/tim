@@ -10,10 +10,10 @@ import (
 type Pages struct {
 	Base        func(title string, isAdmin bool, page templ.Component) templ.Component
 	Index       func() templ.Component
-	AdminSignup func(data *shared.AdminTemplateData) templ.Component
-	Post        func(data shared.PostTemplateData) templ.Component
-	CreatePost  func(data shared.AdminTemplateData) templ.Component
-	AdminLogin  func(data *shared.AdminTemplateData) templ.Component
+	AdminSignup func(data *shared.TemplateData) templ.Component
+	Post        func(data *shared.TemplateData) templ.Component
+	CreatePost  func(data *shared.TemplateData) templ.Component
+	AdminLogin  func(data *shared.TemplateData) templ.Component
 }
 
 type Partials struct {

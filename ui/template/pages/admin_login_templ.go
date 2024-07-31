@@ -15,7 +15,7 @@ import (
 	"github.com/timenglesf/personal-site/ui/template/components"
 )
 
-func AdminLogin(data *shared.AdminTemplateData) templ.Component {
+func AdminLogin(data *shared.TemplateData) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -32,23 +32,10 @@ func AdminLogin(data *shared.AdminTemplateData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if data.Flash.Message != "" {
-			switch data.Flash.Type {
-			case "error":
-				templ_7745c5c3_Err = components.ErrorAlert(data.Flash.Message, "", "mb-6").Render(ctx, templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			case "warning":
-				templ_7745c5c3_Err = components.WarningAlert(data.Flash.Message, "", "mb-6").Render(ctx, templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			case "success":
-				templ_7745c5c3_Err = components.SuccessAlert(data.Flash.Message, "", "mb-6").Render(ctx, templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
+		if data.Flash.Type != "" {
+			templ_7745c5c3_Err = DisplayFlashAlert(data.Flash).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
 			}
 		}
 		if data.LoginForm.FieldErrors["email"] != "" {
