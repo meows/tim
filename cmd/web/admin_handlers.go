@@ -18,7 +18,7 @@ func (app *application) handleDisplayAdminPage(w http.ResponseWriter, r *http.Re
 		// Display the admin signup page
 		if errors.Is(err, models.ErrNoRecord) {
 			data := app.newTemplateData(r)
-			app.renderAdminPage(w, r, app.pageTemplates.AdminSignup, "Admin Sign Up", &data)
+			app.renderPage(w, r, app.pageTemplates.AdminSignup, "Admin Sign Up", &data)
 			return
 
 		}
@@ -29,14 +29,14 @@ func (app *application) handleDisplayAdminPage(w http.ResponseWriter, r *http.Re
 
 	// display admin login page
 	data := app.newTemplateData(r)
-	app.renderAdminPage(w, r, app.pageTemplates.AdminLogin, "Admin Login", &data)
+	app.renderPage(w, r, app.pageTemplates.AdminLogin, "Admin Login", &data)
 
 	// TODO: Display admin dashboard if logged in
 }
 
 func (app *application) handleAdminSignupPage(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
-	app.renderAdminPage(w, r, app.pageTemplates.AdminSignup, "Admin Sign Up", &data)
+	app.renderPage(w, r, app.pageTemplates.AdminSignup, "Admin Sign Up", &data)
 }
 
 func (app *application) handleAdminSignupPost(w http.ResponseWriter, r *http.Request) {
@@ -69,7 +69,7 @@ func (app *application) handleAdminSignupPost(w http.ResponseWriter, r *http.Req
 	data.SignUpForm = form
 
 	if !form.Valid() {
-		app.renderAdminPage(w, r, app.pageTemplates.AdminSignup, "Admin Signup", &data)
+		app.renderPage(w, r, app.pageTemplates.AdminSignup, "Admin Signup", &data)
 		return
 	}
 
@@ -132,13 +132,13 @@ func (app *application) handleAdminLoginPage(w http.ResponseWriter, r *http.Requ
 		data.Flash = shared.FlashMessage{Message: flashError, Type: "error"}
 	}
 
-	app.renderAdminPage(w, r, app.pageTemplates.AdminLogin, "Admin Login", &data)
+	app.renderPage(w, r, app.pageTemplates.AdminLogin, "Admin Login", &data)
 }
 
 func displayAdminLoginWithInvalidCredAlert(app *application, w http.ResponseWriter, r *http.Request, data *shared.TemplateData) {
 	data.Flash = shared.FlashMessage{Message: "Email or Password Incorrect", Type: "warning"}
 	w.WriteHeader(http.StatusUnprocessableEntity)
-	app.renderAdminPage(w, r, app.pageTemplates.AdminLogin, "Admin Login", data)
+	app.renderPage(w, r, app.pageTemplates.AdminLogin, "Admin Login", data)
 }
 
 func (app *application) handleAdminLoginPost(w http.ResponseWriter, r *http.Request) {
@@ -164,7 +164,7 @@ func (app *application) handleAdminLoginPost(w http.ResponseWriter, r *http.Requ
 	if !form.Valid() {
 		data := app.newTemplateData(r)
 		data.LoginForm = form
-		app.renderAdminPage(w, r, app.pageTemplates.AdminLogin, "Admin Login", &data)
+		app.renderPage(w, r, app.pageTemplates.AdminLogin, "Admin Login", &data)
 		return
 	}
 
@@ -175,7 +175,7 @@ func (app *application) handleAdminLoginPost(w http.ResponseWriter, r *http.Requ
 			data := app.newTemplateData(r)
 			data.Flash = shared.FlashMessage{Message: "Admin does not exist", Type: "warning"}
 			w.WriteHeader(http.StatusUnprocessableEntity)
-			app.renderAdminPage(w, r, app.pageTemplates.AdminSignup, "Sign Up", &data)
+			app.renderPage(w, r, app.pageTemplates.AdminSignup, "Sign Up", &data)
 			return
 		}
 	}
@@ -209,6 +209,9 @@ func (app *application) handleAdminLoginPost(w http.ResponseWriter, r *http.Requ
 
 	app.sessionManager.Put(r.Context(), "authenticatedUserID", targetUser.ID)
 	app.sessionManager.Put(r.Context(), "isAdminRole", true)
+
+	// TODO: Forward to dashboard
+	fmt.Fprintln(w, "Admin logged in")
 }
 
 func (app *application) handleAdminLogoutPost(w http.ResponseWriter, r *http.Request) {
@@ -219,5 +222,6 @@ func (app *application) handleAdminLogoutPost(w http.ResponseWriter, r *http.Req
 	app.sessionManager.Remove(r.Context(), "authenticatedUserID")
 	app.sessionManager.Remove(r.Context(), "isAdminRole")
 
-	http.Redirect(w, r, "/admin/login", http.StatusSeeOther)
+	w.Header().Set("HX-Redirect", "/")
+	w.WriteHeader(http.StatusNoContent)
 }

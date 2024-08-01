@@ -8,8 +8,8 @@ import (
 )
 
 type Pages struct {
-	Base        func(title string, isAdmin bool, page templ.Component) templ.Component
-	Index       func() templ.Component
+	Base        func(title string, page templ.Component, data *shared.TemplateData) templ.Component
+	Index       func(data *shared.TemplateData) templ.Component
 	AdminSignup func(data *shared.TemplateData) templ.Component
 	Post        func(data *shared.TemplateData) templ.Component
 	CreatePost  func(data *shared.TemplateData) templ.Component
@@ -17,7 +17,7 @@ type Pages struct {
 }
 
 type Partials struct {
-	PageHeader  func(isAdmin bool) templ.Component
+	PageHeader  func(data *shared.TemplateData) templ.Component
 	ThemeToggle func() templ.Component
 	// Footer      func() templ.Component
 }

@@ -1,27 +1,36 @@
 package partials
 
+import "github.com/timenglesf/personal-site/internal/shared"
+
 templ navLink(hrefStr templ.SafeURL, text string) {
 	<a href={ hrefStr } class="text-xl text-base-content hover:text-primary duration-300">{ text }</a>
 }
 
-templ PageHeader(isAdmin bool) {
+templ logoutLink() {
+	<button hx-post="/admin/logout" hx-trigger="click" class="text-xl text-base-content hover:text-primary duration-300">Logout</button>
+}
+
+templ PageHeader(d *shared.TemplateData) {
 	<header class="bg-base-100 p-4">
 		<div class="navbar container mx-auto">
 			<div class="navbar-start flex items-center">
 				<img class="h-24 mr-4 rounded-lg" src="/static/dist/img/icon.webp" alt="Logo"/>
 				<div class="text-3xl font-bold text-primary">timengle.dev</div>
 			</div>
-			<nav class="navbar-end">
+			<nav class="navbar navbar-end">
 				<ul class="flex space-x-4">
 					@navLink("/", "Home")
 					@navLink("/blog", "Blog")
 					@navLink("/about", "About")
 					@navLink("/contact", "Contact")
-					if isAdmin {
+					if  d.IsAuthenticated {
 						@navLink("/admin", "Admin")
 					}
 				</ul>
 			</nav>
+			if d.IsAdmin {
+				@logoutLink()
+			}
 			<label class="flex cursor-pointer ml-4 gap-2">
 				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 					<circle cx="12" cy="12" r="5"></circle>

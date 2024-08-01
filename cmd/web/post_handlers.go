@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -21,14 +20,11 @@ func (app *application) handleDisplayCreatePostForm(w http.ResponseWriter, r *ht
 	// TODO: Make sure user is logged in and is an admin
 
 	data := app.newTemplateData(r)
-	app.renderAdminPage(w, r, app.pageTemplates.CreatePost, "Create Post", &data)
-	// page := app.pageTemplates.CreatePost(&data)
-	//	w.Header().Set("Content-Type", "text/html")
-	// base := template.Base("Create Post", true, page)
-	// if err := base.Render(context.Background(), w); err != nil {
-	// app.serverError(w, r, err)
-	// return
-	// }
+	if !data.IsAdmin {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	app.renderPage(w, r, app.pageTemplates.CreatePost, "Create Post", &data)
 }
 
 // Saves a newly created blog to db and redirects to view the post
@@ -49,11 +45,7 @@ func (app *application) handleCreateBlogPost(w http.ResponseWriter, r *http.Requ
 	if !form.Valid() {
 		data := app.newTemplateData(r)
 		data.BlogForm = form
-		page := app.pageTemplates.CreatePost(&data)
-		base := app.pageTemplates.Base("Create Post", true, page)
-		w.WriteHeader(http.StatusUnprocessableEntity)
-		base.Render(context.Background(), w)
-		app.renderAdminPage(w, r, app.pageTemplates.CreatePost, "Create Post", &data)
+		app.renderPage(w, r, app.pageTemplates.CreatePost, "Create Post", &data)
 		return
 	}
 
@@ -111,7 +103,7 @@ func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request
 	//	base := template.Base(data.BlogPost.Title, false, page)
 	//
 	//	base.Render(r.Context(), w)
-	app.renderAdminPage(w, r, app.pageTemplates.Post, "Post", &data)
+	app.renderPage(w, r, app.pageTemplates.Post, "Post", &data)
 }
 
 func (app *application) handleGetLatestBlogPosts(w http.ResponseWriter, r *http.Request) {

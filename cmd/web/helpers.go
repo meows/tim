@@ -87,9 +87,9 @@ func (app *application) isAdmin(r *http.Request) bool {
 	return app.sessionManager.GetBool(r.Context(), "isAdminRole")
 }
 
-func (app *application) renderAdminPage(w http.ResponseWriter, r *http.Request, templateFunc func(data *shared.TemplateData) templ.Component, title string, data *shared.TemplateData) {
+func (app *application) renderPage(w http.ResponseWriter, r *http.Request, templateFunc func(data *shared.TemplateData) templ.Component, title string, data *shared.TemplateData) {
 	page := templateFunc(data)
-	base := app.pageTemplates.Base(title, false, page)
+	base := app.pageTemplates.Base(title, page, data)
 	err := base.Render(r.Context(), w)
 	if err != nil {
 		app.serverError(w, r, err)
