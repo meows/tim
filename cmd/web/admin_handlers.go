@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/timenglesf/personal-site/internal/models"
 	"github.com/timenglesf/personal-site/internal/shared"
@@ -48,12 +49,14 @@ func (app *application) handleAdminSignupPost(w http.ResponseWriter, r *http.Req
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
+	form.Email = strings.TrimSpace(form.Email)
+	form.ConfirmEmail = strings.TrimSpace(form.ConfirmEmail)
 
 	form.CheckField(validator.NotBlank(form.Email), "email", "Email is required")
 	form.CheckField(validator.ValidEmail(form.Email), "email", "Invalid email format")
 	form.CheckField(validator.MaxChars(form.Email, 100), "email", "Email is too long (maximum is 100 characters)")
 	form.CheckField(validator.NotBlank(form.ConfirmEmail), "confirm_email", "Confirm Email is required")
-	form.CheckField(validator.EqualStrings(form.Email, form.ConfirmEmail), "confirm_email", "Emails do not match")
+	form.CheckField(validator.EqualEmails(form.Email, form.ConfirmEmail), "confirm_email", "Emails do not match")
 
 	form.CheckField(validator.NotBlank(form.DisplayName), "display_name", "Name is required")
 	form.CheckField(validator.MaxChars(form.DisplayName, 50), "display_name", "Name is too long (maximum is 50 characters)")
@@ -150,8 +153,7 @@ func (app *application) handleAdminLoginPost(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	fmt.Println(form.Email)
-	fmt.Println(form.Password)
+	form.Email = strings.TrimSpace(form.Email)
 
 	form.CheckField(validator.NotBlank(form.Email), "email", "Email is required")
 	form.CheckField(validator.ValidEmail(form.Email), "email", "Invalid email format")
@@ -169,7 +171,6 @@ func (app *application) handleAdminLoginPost(w http.ResponseWriter, r *http.Requ
 	}
 
 	admin, err := app.user.GetAdmin()
-	fmt.Print(admin)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
 			data := app.newTemplateData(r)
@@ -183,7 +184,7 @@ func (app *application) handleAdminLoginPost(w http.ResponseWriter, r *http.Requ
 	data := app.newTemplateData(r)
 	data.LoginForm = form
 
-	targetUser, err := app.user.GetByEmail(form.Email)
+	targetUser, err := app.user.GetByEmail(strings.ToLower(form.Email))
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
 			displayAdminLoginWithInvalidCredAlert(app, w, r, &data)

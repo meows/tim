@@ -4,19 +4,21 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
-	ID        int       `json:"id" db:"id"`
-	Username  string    `json:"username" db:"username"`
-	Password  string    `json:"password" db:"password"`
-	Email     string    `json:"email" db:"email"`
-	IsAdmin   bool      `json:"is_admin" db:"is_admin"`
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
-	LastLogin time.Time `json:"last_login" db:"last_login"`
+	CreatedAt time.Time `db:"created_at"`
+	LastLogin time.Time `db:"last_login"`
+	ID        string    `db:"id"`
+	Username  string    `db:"username"`
+	Password  string    `db:"password"`
+	Email     string    `db:"email"`
+	IsAdmin   bool      `db:"is_admin"`
 }
 
 type UserModel struct {
@@ -39,32 +41,33 @@ func (m *UserModel) GetAdmin() (*User, error) {
 	return &user, nil
 }
 
-func (m *UserModel) Insert(username, email, password string, isAdmin bool) (int, error) {
+func (m *UserModel) Insert(username, email, password string, isAdmin bool) (string, error) {
 	admin, err := m.GetAdmin()
 	if err != nil {
 		fmt.Println(err, "here is error")
 		if !errors.Is(err, ErrNoRecord) {
-			return 0, ErrNoRecord
+			return "", ErrNoRecord
 		}
 	}
 
 	if isAdmin && admin != nil {
-		return 0, ErrDuplicateAdmin
+		return "", ErrDuplicateAdmin
 	}
 
-	stmt := `INSERT INTO users (username, email, password, is_admin, last_login) VALUES(?, ?, ?, ?, ?)`
+	stmt := `INSERT INTO users (id, username, email, password, is_admin, last_login) VALUES(?, ?, ?, ?, ?, ?)`
 
-	result, err := m.DB.Exec(stmt, username, email, password, isAdmin, time.Now().UTC())
+	id := uuid.New().String()
+	_, err = m.DB.Exec(stmt, id, username, strings.ToLower(email), password, isAdmin, time.Now().UTC())
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
-	id, err := result.LastInsertId()
-	if err != nil {
-		return 0, err
-	}
+	//	insertId, err := result.LastInsertId()
+	//	if err != nil {
+	//		return "", err
+	//	}
 
-	return int(id), nil
+	return id, nil
 }
 
 func (m *UserModel) GetByEmail(email string) (*User, error) {
