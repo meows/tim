@@ -11,16 +11,16 @@ func ShouldShowUpdatedAt(createdAt, updatedAt time.Time) bool {
 	return updatedAt.Sub(createdAt) >= 6*time.Hour
 }
 
-templ Post(pt shared.PostTemplateData) {
-	<h1 class="title">{ pt.BlogPost.Title }</h1>
-	if pt.Flash != "" {
-		<p class="flash font-bold">{ pt.Flash }</p>
+templ Post(d *shared.TemplateData) {
+	<h1 class="title">{ d.BlogPost.Title }</h1>
+	if d.Flash.Type != "" {
+		@DisplayFlashAlert(d.Flash)
 	}
-	<p class="date">{ pt.BlogPost.CreatedAt.Weekday().String() } { pt.BlogPost.CreatedAt.Format(shared.DateLayout) }</p>
-	if ShouldShowUpdatedAt(pt.BlogPost.CreatedAt, pt.BlogPost.UpdatedAt) {
-		<p class="date">Last updated: { pt.BlogPost.UpdatedAt.Weekday().String() } { pt.BlogPost.UpdatedAt.Format(shared.DateLayout) }</p>
+	<p class="date">{ d.BlogPost.CreatedAt.Weekday().String() } { d.BlogPost.CreatedAt.Format(shared.DateLayout) }</p>
+	if ShouldShowUpdatedAt(d.BlogPost.CreatedAt, d.BlogPost.UpdatedAt) {
+		<p class="date">Last updated: { d.BlogPost.UpdatedAt.Weekday().String() } { d.BlogPost.UpdatedAt.Format(shared.DateLayout) }</p>
 	}
 	<div class="updated">
-		@shared.Unsafe(pt.BlogPost.ContentHTML)
+		@shared.Unsafe(d.BlogPost.ContentHTML)
 	</div>
 }

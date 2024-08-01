@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -11,7 +10,6 @@ import (
 	"github.com/timenglesf/personal-site/internal/models"
 	"github.com/timenglesf/personal-site/internal/shared"
 	"github.com/timenglesf/personal-site/internal/validator"
-	"github.com/timenglesf/personal-site/ui/template"
 	"github.com/yuin/goldmark"
 )
 
@@ -21,13 +19,12 @@ import (
 func (app *application) handleDisplayCreatePostForm(w http.ResponseWriter, r *http.Request) {
 	// TODO: Make sure user is logged in and is an admin
 
-	page := template.Pages.CreatePost(shared.AdminTemplateData{})
-	w.Header().Set("Content-Type", "text/html")
-	base := template.Base("Create Post", true, page)
-	if err := base.Render(context.Background(), w); err != nil {
-		app.serverError(w, r, err)
+	data := app.newTemplateData(r)
+	if !data.IsAdmin {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
+	app.renderPage(w, r, app.pageTemplates.CreatePost, "Create Post", &data)
 }
 
 // Saves a newly created blog to db and redirects to view the post
@@ -46,12 +43,9 @@ func (app *application) handleCreateBlogPost(w http.ResponseWriter, r *http.Requ
 	form.CheckField(validator.NotBlank(form.Content), "content", "Content is required")
 
 	if !form.Valid() {
-		data := app.newAdminTemplateData(r)
+		data := app.newTemplateData(r)
 		data.BlogForm = form
-		page := template.Pages.CreatePost(data)
-		base := template.Base("Create Post", true, page)
-		w.WriteHeader(http.StatusUnprocessableEntity)
-		base.Render(context.Background(), w)
+		app.renderPage(w, r, app.pageTemplates.CreatePost, "Create Post", &data)
 		return
 	}
 
@@ -61,7 +55,7 @@ func (app *application) handleCreateBlogPost(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	app.sessionManager.Put(r.Context(), "flash", "Post succesfully created!")
+	app.sessionManager.Put(r.Context(), "flashSuccess", "Post succesfully created!")
 
 	http.Redirect(w, r, fmt.Sprintf("/post/view/%d", id), http.StatusSeeOther)
 }
@@ -84,7 +78,7 @@ func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	data := app.newPostTemplateData(r)
+	data := app.newTemplateData(r)
 	data.BlogPost = post
 
 	// convert markdown to html
@@ -97,15 +91,19 @@ func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request
 	data.BlogPost.ContentHTML = buf.String()
 
 	// Get flash message from session
-	flash := app.sessionManager.PopString(r.Context(), "flash")
-	data.Flash = flash
+	flashSuccess := app.sessionManager.PopString(r.Context(), "flashSuccess")
+	if flashSuccess != "" {
+		data.Flash = shared.FlashMessage{Message: flashSuccess, Type: "Post created successfully"}
+	}
 
-	page := template.Pages.Post(*data)
-
-	w.Header().Set("Content-Type", "text/html")
-
-	base := template.Base(data.BlogPost.Title, false, page)
-	base.Render(context.Background(), w)
+	//	page := app.pageTemplates.Post(*data)
+	//
+	//	w.WriteHeader(http.StatusCreated)
+	//
+	//	base := template.Base(data.BlogPost.Title, false, page)
+	//
+	//	base.Render(r.Context(), w)
+	app.renderPage(w, r, app.pageTemplates.Post, "Post", &data)
 }
 
 func (app *application) handleGetLatestBlogPosts(w http.ResponseWriter, r *http.Request) {

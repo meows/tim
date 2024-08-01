@@ -2,18 +2,21 @@ package template
 
 import (
 	"github.com/timenglesf/personal-site/ui/template/partials"
+	"github.com/timenglesf/personal-site/internal/shared"
 )
 
-templ Base(title string, isAdmin bool, page templ.Component) {
-	<html data-theme="nord nord">
+templ Base(title string, page templ.Component, data *shared.TemplateData) {
+	<html data-theme="mytheme mytheme ">
 		<head>
 			<title>{ title }</title>
 			<link rel="stylesheet" href="/static/dist/style/styles.css"/>
 			<script defer src="/static/dist/js/form-prevent.js"></script>
+			<script defer src="/static/dist/js/app.js"></script>
+			<script defer src="/static/dist/js/htmx.min.js"></script>
 			// <script defer src="https://cdn.jsdelivr.net/npm/theme-change@2.0.2/index.js"></script>
 		</head>
-		<body>
-			@partials.PageHeader(isAdmin)
+		<body class="bg-base-100 text-base-content">
+			@partials.PageHeader(data)
 			@page
 		</body>
 	</html>

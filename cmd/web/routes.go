@@ -22,7 +22,7 @@ func (app *application) routes() http.Handler {
 	mux.Handle("GET /posts/latest", dynamic.ThenFunc(app.handleGetLatestBlogPosts))
 
 	// Admin routes
-	mux.Handle("GET /admin", dynamic.ThenFunc(app.handleDisplayAdminPage))
+	mux.Handle("GET /admin/{$}", dynamic.ThenFunc(app.handleDisplayAdminPage))
 	mux.Handle("GET /admin/signup", dynamic.ThenFunc(app.handleAdminSignupPage))
 	mux.Handle("POST /admin/signup", dynamic.ThenFunc(app.handleAdminSignupPost))
 	mux.Handle("GET /admin/login", dynamic.ThenFunc(app.handleAdminLoginPage))

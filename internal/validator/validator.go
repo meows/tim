@@ -57,6 +57,11 @@ func EqualStrings(a, b string) bool {
 	return a == b
 }
 
+// EqualEmails() returns true if two email addresses are equal.
+func EqualEmails(a, b string) bool {
+	return strings.ToLower(a) == strings.ToLower(b)
+}
+
 // ValidEmail() returns true if the email address is valid.
 func ValidEmail(email string) bool {
 	const emailRegexPattern = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
