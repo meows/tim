@@ -20,15 +20,16 @@ import (
 var version = "1.0.0"
 
 type application struct {
-	logger         *slog.Logger
-	cfg            *config
-	meta           *models.MetaModel
-	user           *models.UserModel
-	post           *models.PostModel
-	db             *sql.DB
-	sessionManager *scs.SessionManager
-	formDecoder    *form.Decoder
-	pageTemplates  *template.Pages
+	logger           *slog.Logger
+	cfg              *config
+	meta             *models.MetaModel
+	user             *models.UserModel
+	post             *models.PostModel
+	db               *sql.DB
+	sessionManager   *scs.SessionManager
+	formDecoder      *form.Decoder
+	pageTemplates    *template.Pages
+	partialTemplates *template.Partials
 }
 
 type config struct {
@@ -70,17 +71,19 @@ func main() {
 	// Initialize page templates
 	pageTemplates := template.CreatePageTemplates()
 	// Initialize partial templates
+	partialTemplates := template.CreatePartialTemplates()
 
 	app := &application{
-		logger:         logger,
-		cfg:            &cfg,
-		meta:           &models.MetaModel{DB: db},
-		user:           &models.UserModel{DB: db},
-		post:           &models.PostModel{DB: db},
-		db:             db,
-		sessionManager: sessionManager,
-		formDecoder:    formDecoder,
-		pageTemplates:  pageTemplates,
+		logger:           logger,
+		cfg:              &cfg,
+		meta:             &models.MetaModel{DB: db},
+		user:             &models.UserModel{DB: db},
+		post:             &models.PostModel{DB: db},
+		db:               db,
+		sessionManager:   sessionManager,
+		formDecoder:      formDecoder,
+		pageTemplates:    pageTemplates,
+		partialTemplates: partialTemplates,
 	}
 
 	meta := models.Meta{

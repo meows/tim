@@ -17,6 +17,7 @@ type FlashMessage struct {
 }
 
 type TemplateData struct {
+	CSRFToken       string
 	User            models.User
 	BlogForm        BlogPostFormData
 	SignUpForm      AdminSignUpForm
