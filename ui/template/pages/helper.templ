@@ -17,3 +17,7 @@ func DisplayFlashAlert(flashMsg shared.FlashMessage) templ.Component {
 	}
 	return nil
 }
+
+templ CSRFHiddenInput(d *shared.TemplateData) {
+	<input type="hidden" name="csrf_token" value={ d.CSRFToken }/>
+}

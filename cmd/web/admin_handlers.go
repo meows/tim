@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/justinas/nosurf"
 	"github.com/timenglesf/personal-site/internal/models"
 	"github.com/timenglesf/personal-site/internal/shared"
 	"github.com/timenglesf/personal-site/internal/validator"
@@ -216,6 +217,18 @@ func (app *application) handleAdminLoginPost(w http.ResponseWriter, r *http.Requ
 }
 
 func (app *application) handleAdminLogoutPost(w http.ResponseWriter, r *http.Request) {
+	sentCSRFToken, err := r.Cookie("csrf_token")
+	if err != nil {
+		app.clientError(w, http.StatusForbidden)
+		return
+	}
+
+	if !nosurf.VerifyToken(nosurf.Token(r), sentCSRFToken.Value) {
+		alertComponent := app.partialTemplates.AlertError("CSRF token incorrect. Please try again", "", "error-message container max-w-screen-sm mx-auto mb-6")
+		alertComponent.Render(r.Context(), w)
+		return
+	}
+
 	if err := app.sessionManager.RenewToken(r.Context()); err != nil {
 		app.serverError(w, r, err)
 	}

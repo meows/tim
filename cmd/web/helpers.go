@@ -8,6 +8,7 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/go-playground/form/v4"
+	"github.com/justinas/nosurf"
 	"github.com/timenglesf/personal-site/internal/shared"
 )
 
@@ -54,6 +55,7 @@ func (app *application) newTemplateData(r *http.Request) shared.TemplateData {
 		IsAuthenticated: app.isAuthenticated(r),
 		IsAdmin:         app.isAdmin(r),
 		CurrentYear:     time.Now().Year(),
+		CSRFToken:       nosurf.Token(r),
 	}
 }
 

@@ -1,7 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    'ui/template/**/*.templ'
+    'ui/template/**/*.templ',
+    'cmd/web/admin_handlers.go',
   ],
   darkMode: 'class',
   theme: {
@@ -33,6 +34,14 @@ module.exports = {
     require('daisyui'),
   ],
   corePlugins: { preflight: true },
+  safelist: [
+    'max-w-screen-sm',
+    'max-w-1/3',
+    'mx-auto',
+    'mb-6',
+    'error-message',
+    'container',
+  ],
   daisyui: {
     themes: [
       "nord",

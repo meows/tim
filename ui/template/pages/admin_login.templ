@@ -25,6 +25,7 @@ templ AdminLogin(data *shared.TemplateData) {
 					// Password input
 					@components.PasswordInput("password", "Password")
 				</div>
+				@CSRFHiddenInput(data)
 				<button class="btn btn-primary" type="submit">Submit</button>
 			</form>
 		</div>
