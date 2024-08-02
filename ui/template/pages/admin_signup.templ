@@ -35,6 +35,7 @@ templ SignUpAdmin(data *shared.TemplateData) {
 					@components.PasswordInput("password", "Password")
 					// Confirm password input
 					@components.PasswordInput("confirm_password", "Confirm Password")
+					@CSRFHiddenInput(data)
 				</div>
 				<button class="btn btn-primary" type="submit">Submit</button>
 			</form>
