@@ -102,7 +102,7 @@ func PageHeader(d *shared.TemplateData) templ.Component {
 			templ_7745c5c3_Var5 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<header class=\"bg-base-100 p-4\"><div class=\"navbar container mx-auto\"><div class=\"navbar-start flex items-center\"><img class=\"h-24 mr-4 rounded-lg\" src=\"/static/dist/img/icon.webp\" alt=\"Logo\"><div class=\"text-3xl font-bold text-primary\">timengle.dev</div></div><nav class=\"navbar navbar-end\"><ul class=\"flex space-x-4\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<header class=\"bg-base-100 p-4\"><div class=\"navbar container mx-auto\"><div class=\"navbar-start flex items-center\"><img class=\"h-24 mr-4 rounded-lg\" src=\"/static/dist/img/icon.webp\" alt=\"Logo\"><div class=\"hidden sm:block text-2xl md:text-3xl font-bold text-primary\">timengle.dev</div></div><nav class=\"navbar navbar-end\"><ul class=\"flex space-x-4\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -128,17 +128,7 @@ func PageHeader(d *shared.TemplateData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</ul></nav>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if d.IsAdmin {
-			templ_7745c5c3_Err = logoutLink(d).Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<label class=\"flex cursor-pointer ml-4 gap-2\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"5\"></circle> <path d=\"M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4\"></path></svg> <input type=\"checkbox\" value=\"synthwave\" class=\"toggle theme-controller\"> <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z\"></path></svg></label></div></header>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</ul></nav></div></header>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

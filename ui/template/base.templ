@@ -15,10 +15,13 @@ templ Base(title string, page templ.Component, data *shared.TemplateData) {
 			<script defer src="/static/dist/js/htmx.min.js"></script>
 			// <script defer src="https://cdn.jsdelivr.net/npm/theme-change@2.0.2/index.js"></script>
 		</head>
-		<body class="bg-base-100 text-base-content">
+		<body class="flex flex-col min-h-screen bg-base-100 text-base-content">
 			@partials.PageHeader(data)
 			<div id="response"></div>
-			@page
+			<main class="flex-grow">
+				@page
+			</main>
+			@partials.PageFooter(data)
 		</body>
 	</html>
 }
