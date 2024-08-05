@@ -17,6 +17,7 @@ type FlashMessage struct {
 }
 
 type TemplateData struct {
+	BlogPosts       []models.Post
 	CSRFToken       string
 	BaseURL         string
 	User            models.User
@@ -25,10 +26,11 @@ type TemplateData struct {
 	LoginForm       AdminLoginForm
 	Flash           *FlashMessage
 	BlogPost        models.Post
-	BlogPosts       []models.Post
+	CurrentYear     int
+	TotalPostCount  int
+	CurrentPage     int
 	IsAuthenticated bool
 	IsAdmin         bool
-	CurrentYear     int
 }
 
 // Form data

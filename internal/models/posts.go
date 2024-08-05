@@ -7,14 +7,14 @@ import (
 )
 
 type Post struct {
-	ID          int       `json:"id" db:"id"`
-	AuthorID    int       `json:"author_id" db:"author_id"`
 	Title       string    `json:"title" db:"title"`
 	Content     string    `json:"content" db:"content"`
 	ContentHTML string    `json:"content_html"`
-	Private     bool      `json:"private" db:"private"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
+	ID          int       `json:"id" db:"id"`
+	AuthorID    int       `json:"author_id" db:"author_id"`
+	Private     bool      `json:"private" db:"private"`
 }
 
 type PostModel struct {
@@ -131,4 +131,21 @@ func (m *PostModel) GetPosts(includePrivatePosts bool, page int, pageSize int) (
 		return nil, err
 	}
 	return posts, nil
+}
+
+func (m *PostModel) Count(includePrivatePosts bool) (int, error) {
+	var stmt string
+	if includePrivatePosts {
+		stmt = `SELECT COUNT(*) FROM posts`
+	} else {
+		stmt = `SELECT COUNT(*) FROM posts WHERE private = false`
+	}
+
+	var count int
+	err := m.DB.QueryRow(stmt).Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }

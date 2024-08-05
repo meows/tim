@@ -41,7 +41,15 @@ func (app *application) handleDisplayAdminPage(w http.ResponseWriter, r *http.Re
 		app.serverError(w, r, err)
 		return
 	}
+
+	totalPosts, err := app.post.Count(true)
+	if err != nil {
+		app.serverError(w, r, err)
+	}
+
 	data.BlogPosts = recentPosts
+	data.TotalPostCount = totalPosts
+	data.CurrentPage = 1
 	fmt.Println("recentPosts: ", recentPosts)
 	app.renderPage(w, r, app.pageTemplates.AdminDashboard, "Dashboard", &data)
 }
@@ -222,8 +230,7 @@ func (app *application) handleAdminLoginPost(w http.ResponseWriter, r *http.Requ
 	app.sessionManager.Put(r.Context(), "authenticatedUserID", targetUser.ID)
 	app.sessionManager.Put(r.Context(), "isAdminRole", true)
 
-	// TODO: Forward to dashboard
-	fmt.Fprintln(w, "Admin logged in")
+	http.Redirect(w, r, "/admin", http.StatusSeeOther)
 }
 
 func (app *application) handleAdminLogoutPost(w http.ResponseWriter, r *http.Request) {
