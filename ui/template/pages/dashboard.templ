@@ -1,0 +1,67 @@
+package pages
+
+import (
+	//	"net/url"
+	"github.com/timenglesf/personal-site/internal/models"
+	"github.com/timenglesf/personal-site/internal/shared"
+	"net/url"
+	"strconv"
+)
+
+templ blogPostData(b *models.Post) {
+	<tr>
+		<td><a href={ templ.SafeURL("/posts/view/" + url.QueryEscape(b.Title)) }></a>{ b.Title }</td>
+		<td>{ b.CreatedAt.Format(shared.DateLayout) }</td>
+		<td>
+			<label>
+				if b.Private {
+					<input type="checkbox" class="checkbox" checked/>
+				} else {
+					<input type="checkbox" class="checkbox"/>
+				}
+			</label>
+		</td>
+		<td>
+			<button type="button" class="btn btn-accent text-primary-content" hx-post="">Update</button>
+			<button type="button" class="btn btn-secondary text-primary-content">View</button>
+		</td>
+	</tr>
+}
+
+func ButtonTotal(count int) int {
+	buttonCount := count / 10
+	if count%10 != 0 {
+		buttonCount++
+	}
+	return buttonCount
+}
+
+templ Pagination(count int, current int) {
+	<div class="join mx-auto">
+		<button class="join-item btn">«</button>
+		<button class="join-item btn">{ strconv.Itoa(current) }</button>
+		<button class="join-item btn">»</button>
+	</div>
+}
+
+templ AdminDashboard(d *shared.TemplateData) {
+	<div class="container flex flex-col mx-auto">
+		<h1 class="mx-auto mb-6 text-3xl font-semibold text-primary">Admin Dashboard</h1>
+		<table class="table mb-4">
+			<thead class="text-xl">
+				<tr>
+					<th>Title</th>
+					<th>Created At</th>
+					<th>Private</th>
+					<th>Options</th>
+				</tr>
+			</thead>
+			<tbody>
+				for _, post := range d.BlogPosts {
+					@blogPostData(&post)
+				}
+			</tbody>
+		</table>
+		@Pagination(ButtonTotal(d.TotalPostCount), d.CurrentPage)
+	</div>
+}

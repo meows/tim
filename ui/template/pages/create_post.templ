@@ -23,9 +23,11 @@ templ CreatePost(data *shared.TemplateData) {
 					@labelDisplay("Title:")
 					@components.TitleInputDisplay(data.BlogForm.Title)
 				</div>
-				<div class="flex flex-col flex-grow justify-start mb-6 max-h-2/3-screen">
+				//	<div class="flex flex-col flex-grow justify-start mb-6 max-h-2/3-screen">
+				<div class="flex flex-col flex-grow justify-start mb-6">
 					@labelDisplay("Content:")
 					@components.TextAreaInputDisplay(data.BlogForm.Content)
+					<input type="hidden" name="csrf_token" value={ data.CSRFToken }/>
 				</div>
 				<div class="mt-4">
 					<button class="btn btn-primary" type="submit">Create Post</button>

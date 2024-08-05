@@ -6,16 +6,21 @@ import (
 	"github.com/timenglesf/personal-site/ui/template/components"
 )
 
-func DisplayFlashAlert(flashMsg shared.FlashMessage) templ.Component {
-	switch flashMsg.Type {
+templ EmptyDiv() {
+	<div></div>
+}
+
+func DisplayFlashAlert(d *shared.TemplateData) templ.Component {
+	switch d.Flash.Type {
 	case "success":
-		return components.SuccessAlert(flashMsg.Message, "success_alert", "mb-6")
+		return components.SuccessAlert(d.Flash.Message, "success_alert", "mb-6")
 	case "warning":
-		return components.WarningAlert(flashMsg.Message, "warning_alert", "mb-6")
+		return components.WarningAlert(d.Flash.Message, "warning_alert", "mb-6")
 	case "error":
-		return components.ErrorAlert(flashMsg.Message, "error_alert", "mb-6")
+		return components.ErrorAlert(d.Flash.Message, "error_alert", "mb-6")
+	default:
+		return EmptyDiv()
 	}
-	return nil
 }
 
 templ CSRFHiddenInput(d *shared.TemplateData) {
