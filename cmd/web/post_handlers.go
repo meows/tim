@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strconv"
+	"net/url"
 
 	"github.com/timenglesf/personal-site/internal/models"
 	"github.com/timenglesf/personal-site/internal/shared"
@@ -17,8 +17,6 @@ import (
 
 // Displays form to create a blog post
 func (app *application) handleDisplayCreatePostForm(w http.ResponseWriter, r *http.Request) {
-	// TODO: Make sure user is logged in and is an admin
-
 	data := app.newTemplateData(r)
 	if !data.IsAdmin {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -29,10 +27,12 @@ func (app *application) handleDisplayCreatePostForm(w http.ResponseWriter, r *ht
 
 // Saves a newly created blog to db and redirects to view the post
 func (app *application) handleCreateBlogPost(w http.ResponseWriter, r *http.Request) {
+	app.logger.Info("Creating new blog post")
 	var form shared.BlogPostFormData
 
 	err := app.decodeForm(r, &form)
 	if err != nil {
+		fmt.Println(err)
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
@@ -62,13 +62,13 @@ func (app *application) handleCreateBlogPost(w http.ResponseWriter, r *http.Requ
 
 // View blog Post by ID
 func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.PathValue("slug"))
-	if err != nil || id < 1 {
-		http.NotFound(w, r)
-		return
+	titleId := r.PathValue("slug")
+	targetPostTitle, err := url.QueryUnescape(titleId)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
 	}
 
-	post, err := app.post.Get(id)
+	post, err := app.post.GetPostByTitle(targetPostTitle)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
 			http.NotFound(w, r)
@@ -80,10 +80,12 @@ func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request
 
 	data := app.newTemplateData(r)
 	data.BlogPost = post
+	fmt.Println(data.BlogPost)
 
 	// convert markdown to html
 	var buf bytes.Buffer
 	if err := goldmark.Convert([]byte(data.BlogPost.Content), &buf); err != nil {
+		app.logger.Error("Error converting markdown to html", "error", err)
 		app.serverError(w, r, err)
 		return
 	}
@@ -93,7 +95,7 @@ func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request
 	// Get flash message from session
 	flashSuccess := app.sessionManager.PopString(r.Context(), "flashSuccess")
 	if flashSuccess != "" {
-		data.Flash = shared.FlashMessage{Message: flashSuccess, Type: "Post created successfully"}
+		data.Flash = &shared.FlashMessage{Message: flashSuccess, Type: "Post created successfully"}
 	}
 
 	//	page := app.pageTemplates.Post(*data)

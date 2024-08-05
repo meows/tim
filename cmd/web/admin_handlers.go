@@ -29,11 +29,21 @@ func (app *application) handleDisplayAdminPage(w http.ResponseWriter, r *http.Re
 		app.serverError(w, r, err)
 	}
 
-	// display admin login page
 	data := app.newTemplateData(r)
-	app.renderPage(w, r, app.pageTemplates.AdminLogin, "Admin Login", &data)
+	// display admin login page
+	if !app.isAdmin(r) {
+		app.renderPage(w, r, app.pageTemplates.AdminLogin, "Admin Login", &data)
+		return
+	}
 
-	// TODO: Display admin dashboard if logged in
+	recentPosts, err := app.post.GetPosts(true, 1, 10)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+	data.BlogPosts = recentPosts
+	fmt.Println("recentPosts: ", recentPosts)
+	app.renderPage(w, r, app.pageTemplates.AdminDashboard, "Dashboard", &data)
 }
 
 func (app *application) handleAdminSignupPage(w http.ResponseWriter, r *http.Request) {
@@ -128,19 +138,19 @@ func (app *application) handleAdminLoginPage(w http.ResponseWriter, r *http.Requ
 
 	flashSuccess := app.sessionManager.PopString(r.Context(), "flashSuccess")
 	if flashSuccess != "" {
-		data.Flash = shared.FlashMessage{Message: flashSuccess, Type: "success"}
+		data.Flash = &shared.FlashMessage{Message: flashSuccess, Type: "success"}
 	}
 
 	flashError := app.sessionManager.PopString(r.Context(), "flashError")
 	if flashError != "" {
-		data.Flash = shared.FlashMessage{Message: flashError, Type: "error"}
+		data.Flash = &shared.FlashMessage{Message: flashError, Type: "error"}
 	}
 
 	app.renderPage(w, r, app.pageTemplates.AdminLogin, "Admin Login", &data)
 }
 
 func displayAdminLoginWithInvalidCredAlert(app *application, w http.ResponseWriter, r *http.Request, data *shared.TemplateData) {
-	data.Flash = shared.FlashMessage{Message: "Email or Password Incorrect", Type: "warning"}
+	data.Flash = &shared.FlashMessage{Message: "Email or Password Incorrect", Type: "warning"}
 	w.WriteHeader(http.StatusUnprocessableEntity)
 	app.renderPage(w, r, app.pageTemplates.AdminLogin, "Admin Login", data)
 }
@@ -175,7 +185,7 @@ func (app *application) handleAdminLoginPost(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
 			data := app.newTemplateData(r)
-			data.Flash = shared.FlashMessage{Message: "Admin does not exist", Type: "warning"}
+			data.Flash = &shared.FlashMessage{Message: "Admin does not exist", Type: "warning"}
 			w.WriteHeader(http.StatusUnprocessableEntity)
 			app.renderPage(w, r, app.pageTemplates.AdminSignup, "Sign Up", &data)
 			return

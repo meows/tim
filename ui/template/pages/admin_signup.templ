@@ -9,7 +9,7 @@ templ SignUpAdmin(data *shared.TemplateData) {
 	<main class="container mx-auto">
 		<div class="mx-auto w-1/2 max-w-2xl">
 			if data.Flash.Type != "" {
-				@DisplayFlashAlert(data.Flash)
+				@DisplayFlashAlert(data)
 			}
 			<form action="/admin/signup" method="post" class="">
 				// Alert message

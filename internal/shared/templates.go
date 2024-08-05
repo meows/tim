@@ -18,11 +18,12 @@ type FlashMessage struct {
 
 type TemplateData struct {
 	CSRFToken       string
+	BaseURL         string
 	User            models.User
 	BlogForm        BlogPostFormData
 	SignUpForm      AdminSignUpForm
 	LoginForm       AdminLoginForm
-	Flash           FlashMessage
+	Flash           *FlashMessage
 	BlogPost        models.Post
 	BlogPosts       []models.Post
 	IsAuthenticated bool

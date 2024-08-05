@@ -9,12 +9,13 @@ import (
 )
 
 type Pages struct {
-	Base        func(title string, page templ.Component, data *shared.TemplateData) templ.Component
-	Index       func(data *shared.TemplateData) templ.Component
-	AdminSignup func(data *shared.TemplateData) templ.Component
-	Post        func(data *shared.TemplateData) templ.Component
-	CreatePost  func(data *shared.TemplateData) templ.Component
-	AdminLogin  func(data *shared.TemplateData) templ.Component
+	Base           func(title string, page templ.Component, data *shared.TemplateData) templ.Component
+	Index          func(data *shared.TemplateData) templ.Component
+	AdminSignup    func(data *shared.TemplateData) templ.Component
+	Post           func(data *shared.TemplateData) templ.Component
+	CreatePost     func(data *shared.TemplateData) templ.Component
+	AdminLogin     func(data *shared.TemplateData) templ.Component
+	AdminDashboard func(data *shared.TemplateData) templ.Component
 }
 
 type Partials struct {
@@ -28,12 +29,13 @@ type Partials struct {
 
 func CreatePageTemplates() *Pages {
 	return &Pages{
-		Base:        Base,
-		Index:       pages.Index,
-		AdminSignup: pages.SignUpAdmin,
-		AdminLogin:  pages.AdminLogin,
-		Post:        pages.Post,
-		CreatePost:  pages.CreatePost,
+		Base:           Base,
+		Index:          pages.Index,
+		AdminSignup:    pages.SignUpAdmin,
+		AdminLogin:     pages.AdminLogin,
+		Post:           pages.Post,
+		CreatePost:     pages.CreatePost,
+		AdminDashboard: pages.AdminDashboard,
 	}
 }
 

@@ -56,6 +56,8 @@ func (app *application) newTemplateData(r *http.Request) shared.TemplateData {
 		IsAdmin:         app.isAdmin(r),
 		CurrentYear:     time.Now().Year(),
 		CSRFToken:       nosurf.Token(r),
+		BaseURL:         app.getBaseURLString(r),
+		Flash:           &shared.FlashMessage{},
 	}
 }
 
@@ -77,6 +79,10 @@ func (app *application) decodeForm(r *http.Request, dst any) error {
 	}
 
 	return nil
+}
+
+func (app *application) getBaseURLString(r *http.Request) string {
+	return r.Proto + "://" + r.Host
 }
 
 // returns true if the session data contains the key "authenticatedUserID"

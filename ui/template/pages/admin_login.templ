@@ -10,7 +10,7 @@ templ AdminLogin(data *shared.TemplateData) {
 		<div class="mx-auto w-1/2 max-w-2xl">
 			<form action="/admin/login" method="post" class="">
 				if data.Flash.Type != "" {
-					@DisplayFlashAlert(data.Flash)
+					@DisplayFlashAlert(data)
 				}
 				if data.LoginForm.FieldErrors["email"] != "" {
 					@components.WarningAlert(data.LoginForm.FieldErrors["email"], "email_warning", "mb-6")

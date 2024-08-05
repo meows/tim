@@ -14,7 +14,7 @@ func ShouldShowUpdatedAt(createdAt, updatedAt time.Time) bool {
 templ Post(d *shared.TemplateData) {
 	<h1 class="title">{ d.BlogPost.Title }</h1>
 	if d.Flash.Type != "" {
-		@DisplayFlashAlert(d.Flash)
+		@DisplayFlashAlert(d)
 	}
 	<p class="date">{ d.BlogPost.CreatedAt.Weekday().String() } { d.BlogPost.CreatedAt.Format(shared.DateLayout) }</p>
 	if ShouldShowUpdatedAt(d.BlogPost.CreatedAt, d.BlogPost.UpdatedAt) {
