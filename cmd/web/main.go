@@ -111,10 +111,20 @@ func main() {
 		}
 	}
 
+	srv := &http.Server{
+		Addr:         ":" + cfg.port,
+		Handler:      app.routes(),
+		ErrorLog:     slog.NewLogLogger(logger.Handler(), slog.LevelError),
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	}
+
 	app.logger.Info("Successfully fetched meta", "meta", fetchedMeta)
 
 	logger.Info("Starting the server", "port", cfg.port)
-	err = http.ListenAndServe(":"+cfg.port, app.routes())
+	err = srv.ListenAndServe()
+	// :err = http.ListenAndServe(":"+cfg.port, app.routes())
 	logger.Error("Server error", "error", err.Error())
 	os.Exit(1)
 }
