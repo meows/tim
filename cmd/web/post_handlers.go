@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/justinas/nosurf"
 	"github.com/timenglesf/personal-site/internal/models"
 	"github.com/timenglesf/personal-site/internal/shared"
 	"github.com/timenglesf/personal-site/internal/validator"
@@ -78,6 +79,21 @@ func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	// Reject unauthorized access to private posts
+	if post.Private {
+		if !app.isAdmin(r) {
+			app.logger.Warn("unauthorized access to url", "url", r.URL.Path, "ip", r.RemoteAddr)
+			referer := r.Referer()
+			fmt.Println(referer)
+			if referer != "" {
+				http.Redirect(w, r, referer, http.StatusSeeOther)
+			} else {
+				http.Redirect(w, r, "/", http.StatusSeeOther)
+			}
+			return
+		}
+	}
+
 	data := app.newTemplateData(r)
 	data.BlogPost = post
 	fmt.Println(data.BlogPost)
@@ -116,5 +132,54 @@ func (app *application) handleGetLatestBlogPosts(w http.ResponseWriter, r *http.
 	}
 	for _, post := range posts {
 		fmt.Fprintf(w, "%+v\n", post)
+	}
+}
+
+func (app *application) handleBlogPostUpdate(w http.ResponseWriter, r *http.Request) {
+	sentCSRFTOKEN, err := r.Cookie("csrf_token")
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	if !nosurf.VerifyToken(nosurf.Token(r), sentCSRFTOKEN.Value) {
+		return
+	}
+
+	slug := r.PathValue("slug")
+	query := r.URL.Query()
+
+	title, _ := url.QueryUnescape(slug)
+
+	post, err := app.post.GetPostByTitle(title)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			http.NotFound(w, r)
+		} else {
+			app.serverError(w, r, err)
+		}
+		return
+	}
+
+	for key, value := range query {
+		switch key {
+		case "title":
+			post.Title = value[0]
+		case "content":
+			post.Content = value[0]
+		case "private":
+			post.Private = !post.Private
+		}
+	}
+
+	if err := app.post.Update(post); err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// Send updated blog post row if this is an updated to the private column
+	if query.Get("private") != "" {
+		updatedRowComponenet := app.partialTemplates.DashboardBlogPostRow(&post)
+		updatedRowComponenet.Render(r.Context(), w)
 	}
 }

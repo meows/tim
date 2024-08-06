@@ -58,9 +58,10 @@ func (app *application) recoverPanic(next http.Handler) http.Handler {
 	})
 }
 
-func noSurf(next http.Handler) http.Handler {
+func (app *application) noSurf(next http.Handler) http.Handler {
 	csrfHandler := nosurf.New(next)
 	csrfHandler.ExemptPath("/admin/logout")
+	csrfHandler.ExemptGlob("/posts/update/*")
 	csrfHandler.SetBaseCookie(http.Cookie{
 		HttpOnly: true,
 		Secure:   true,

@@ -149,3 +149,12 @@ func (m *PostModel) Count(includePrivatePosts bool) (int, error) {
 
 	return count, nil
 }
+
+func (m *PostModel) Update(p Post) error {
+	stmt := `UPDATE posts SET title = ?, content = ?, private = ?, author_id = ?, updated_at = ? WHERE id = ?`
+	_, err := m.DB.Exec(stmt, p.Title, p.Content, p.Private, p.AuthorID, time.Now(), p.ID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
