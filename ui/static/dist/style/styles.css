@@ -1579,19 +1579,6 @@ html {
 }
 
 @supports (color: color-mix(in oklab, black, black)) {
-  .btn-active {
-    background-color: color-mix(
-          in oklab,
-          oklch(var(--btn-color, var(--b3)) / var(--tw-bg-opacity, 1)) 90%,
-          black
-        );
-    border-color: color-mix(
-          in oklab,
-          oklch(var(--btn-color, var(--b3)) / var(--tw-border-opacity, 1)) 90%,
-          black
-        );
-  }
-
   .btn-outline.btn-primary.btn-active {
     background-color: color-mix(in oklab, var(--fallback-p,oklch(var(--p)/1)) 90%, black);
     border-color: color-mix(in oklab, var(--fallback-p,oklch(var(--p)/1)) 90%, black);
@@ -1605,26 +1592,6 @@ html {
   .btn-outline.btn-accent.btn-active {
     background-color: color-mix(in oklab, var(--fallback-a,oklch(var(--a)/1)) 90%, black);
     border-color: color-mix(in oklab, var(--fallback-a,oklch(var(--a)/1)) 90%, black);
-  }
-
-  .btn-outline.btn-success.btn-active {
-    background-color: color-mix(in oklab, var(--fallback-su,oklch(var(--su)/1)) 90%, black);
-    border-color: color-mix(in oklab, var(--fallback-su,oklch(var(--su)/1)) 90%, black);
-  }
-
-  .btn-outline.btn-info.btn-active {
-    background-color: color-mix(in oklab, var(--fallback-in,oklch(var(--in)/1)) 90%, black);
-    border-color: color-mix(in oklab, var(--fallback-in,oklch(var(--in)/1)) 90%, black);
-  }
-
-  .btn-outline.btn-warning.btn-active {
-    background-color: color-mix(in oklab, var(--fallback-wa,oklch(var(--wa)/1)) 90%, black);
-    border-color: color-mix(in oklab, var(--fallback-wa,oklch(var(--wa)/1)) 90%, black);
-  }
-
-  .btn-outline.btn-error.btn-active {
-    background-color: color-mix(in oklab, var(--fallback-er,oklch(var(--er)/1)) 90%, black);
-    border-color: color-mix(in oklab, var(--fallback-er,oklch(var(--er)/1)) 90%, black);
   }
 }
 
@@ -1678,26 +1645,6 @@ html {
   --glass-border-opacity: 15%;
 }
 
-.btn-ghost.btn-active {
-  border-color: transparent;
-  background-color: var(--fallback-bc,oklch(var(--bc)/0.2));
-}
-
-.btn-link.btn-active {
-  border-color: transparent;
-  background-color: transparent;
-  text-decoration-line: underline;
-}
-
-.btn-outline.btn-active {
-  --tw-border-opacity: 1;
-  border-color: var(--fallback-bc,oklch(var(--bc)/var(--tw-border-opacity)));
-  --tw-bg-opacity: 1;
-  background-color: var(--fallback-bc,oklch(var(--bc)/var(--tw-bg-opacity)));
-  --tw-text-opacity: 1;
-  color: var(--fallback-b1,oklch(var(--b1)/var(--tw-text-opacity)));
-}
-
 .btn-outline.btn-primary {
   --tw-text-opacity: 1;
   color: var(--fallback-p,oklch(var(--p)/var(--tw-text-opacity)));
@@ -1726,26 +1673,6 @@ html {
 .btn-outline.btn-accent.btn-active {
   --tw-text-opacity: 1;
   color: var(--fallback-ac,oklch(var(--ac)/var(--tw-text-opacity)));
-}
-
-.btn-outline.btn-success.btn-active {
-  --tw-text-opacity: 1;
-  color: var(--fallback-suc,oklch(var(--suc)/var(--tw-text-opacity)));
-}
-
-.btn-outline.btn-info.btn-active {
-  --tw-text-opacity: 1;
-  color: var(--fallback-inc,oklch(var(--inc)/var(--tw-text-opacity)));
-}
-
-.btn-outline.btn-warning.btn-active {
-  --tw-text-opacity: 1;
-  color: var(--fallback-wac,oklch(var(--wac)/var(--tw-text-opacity)));
-}
-
-.btn-outline.btn-error.btn-active {
-  --tw-text-opacity: 1;
-  color: var(--fallback-erc,oklch(var(--erc)/var(--tw-text-opacity)));
 }
 
 .btn.btn-disabled,
@@ -2275,49 +2202,6 @@ html {
       var(--handleoffsetcalculator) 0 0 3px var(--fallback-bc,oklch(var(--bc)/1)) inset;
 }
 
-.glass,
-  .glass.btn-active {
-  border: none;
-  -webkit-backdrop-filter: blur(var(--glass-blur, 40px));
-          backdrop-filter: blur(var(--glass-blur, 40px));
-  background-color: transparent;
-  background-image: linear-gradient(
-        135deg,
-        rgb(255 255 255 / var(--glass-opacity, 30%)) 0%,
-        rgb(0 0 0 / 0%) 100%
-      ),
-      linear-gradient(
-        var(--glass-reflex-degree, 100deg),
-        rgb(255 255 255 / var(--glass-reflex-opacity, 10%)) 25%,
-        rgb(0 0 0 / 0%) 25%
-      );
-  box-shadow: 0 0 0 1px rgb(255 255 255 / var(--glass-border-opacity, 10%)) inset,
-      0 0 0 2px rgb(0 0 0 / 5%);
-  text-shadow: 0 1px rgb(0 0 0 / var(--glass-text-shadow-opacity, 5%));
-}
-
-@media (hover: hover) {
-  .glass.btn-active {
-    border: none;
-    -webkit-backdrop-filter: blur(var(--glass-blur, 40px));
-            backdrop-filter: blur(var(--glass-blur, 40px));
-    background-color: transparent;
-    background-image: linear-gradient(
-          135deg,
-          rgb(255 255 255 / var(--glass-opacity, 30%)) 0%,
-          rgb(0 0 0 / 0%) 100%
-        ),
-        linear-gradient(
-          var(--glass-reflex-degree, 100deg),
-          rgb(255 255 255 / var(--glass-reflex-opacity, 10%)) 25%,
-          rgb(0 0 0 / 0%) 25%
-        );
-    box-shadow: 0 0 0 1px rgb(255 255 255 / var(--glass-border-opacity, 10%)) inset,
-        0 0 0 2px rgb(0 0 0 / 5%);
-    text-shadow: 0 1px rgb(0 0 0 / var(--glass-text-shadow-opacity, 5%));
-  }
-}
-
 .join.join-vertical {
   flex-direction: column;
 }
@@ -2407,6 +2291,10 @@ html {
   margin-top: 1rem;
 }
 
+.block {
+  display: block;
+}
+
 .flex {
   display: flex;
 }
@@ -2475,12 +2363,24 @@ html {
   width: 1.5rem;
 }
 
+.w-3\/4 {
+  width: 75%;
+}
+
 .max-w-2xl {
   max-width: 42rem;
 }
 
 .max-w-screen-sm {
   max-width: 640px;
+}
+
+.max-w-\[48rem\] {
+  max-width: 48rem;
+}
+
+.max-w-3xl {
+  max-width: 48rem;
 }
 
 .shrink-0 {
@@ -2564,6 +2464,11 @@ html {
   line-height: 2rem;
 }
 
+.text-3xl {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+
 .text-lg {
   font-size: 1.125rem;
   line-height: 1.75rem;
@@ -2572,11 +2477,6 @@ html {
 .text-xl {
   font-size: 1.25rem;
   line-height: 1.75rem;
-}
-
-.text-3xl {
-  font-size: 1.875rem;
-  line-height: 2.25rem;
 }
 
 .font-bold {
@@ -2625,5 +2525,11 @@ html {
   .md\:text-3xl {
     font-size: 1.875rem;
     line-height: 2.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\:w-1\/2 {
+    width: 50%;
   }
 }

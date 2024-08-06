@@ -61,7 +61,7 @@ func (app *application) handleCreateBlogPost(w http.ResponseWriter, r *http.Requ
 	http.Redirect(w, r, fmt.Sprintf("/post/view/%d", id), http.StatusSeeOther)
 }
 
-// View blog Post by ID
+// Render blog Post by Title
 func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request) {
 	titleId := r.PathValue("slug")
 	targetPostTitle, err := url.QueryUnescape(titleId)
@@ -114,14 +114,8 @@ func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request
 		data.Flash = &shared.FlashMessage{Message: flashSuccess, Type: "Post created successfully"}
 	}
 
-	//	page := app.pageTemplates.Post(*data)
-	//
-	//	w.WriteHeader(http.StatusCreated)
-	//
-	//	base := template.Base(data.BlogPost.Title, false, page)
-	//
-	//	base.Render(r.Context(), w)
-	app.renderPage(w, r, app.pageTemplates.Post, "Post", &data)
+	app.renderBlogPostPage(w, r, post.Title, &data)
+	// app.renderPage(w, r, app.pageTemplates.Post, "Post", &data)
 }
 
 func (app *application) handleGetLatestBlogPosts(w http.ResponseWriter, r *http.Request) {

@@ -11,6 +11,7 @@ import (
 
 type Pages struct {
 	Base           func(title string, page templ.Component, data *shared.TemplateData) templ.Component
+	PostBase       func(title string, page templ.Component, data *shared.TemplateData) templ.Component
 	Index          func(data *shared.TemplateData) templ.Component
 	AdminSignup    func(data *shared.TemplateData) templ.Component
 	Post           func(data *shared.TemplateData) templ.Component
@@ -32,6 +33,7 @@ type Partials struct {
 func CreatePageTemplates() *Pages {
 	return &Pages{
 		Base:           Base,
+		PostBase:       PostBase,
 		Index:          pages.Index,
 		AdminSignup:    pages.SignUpAdmin,
 		AdminLogin:     pages.AdminLogin,
