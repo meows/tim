@@ -103,7 +103,7 @@ func (m *UserModel) Authenticate(email, password string, checkAdmin bool) (*User
 	now := time.Now().UTC()
 	user.LastLogin = &now
 	if err = m.DB.Save(&user).Error; err != nil {
-		return nil, ErrSaveUser
+		return nil, ErrUpdateUser
 	}
 	return &user, nil
 }
