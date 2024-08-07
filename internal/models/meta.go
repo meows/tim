@@ -1,12 +1,14 @@
 package models
 
-import "database/sql"
+import (
+	"gorm.io/gorm"
+)
 
 type Meta struct {
-	ID          int
-	Version     string
-	Name        string
-	LastUpdated string
+	gorm.Model
+	Version     string `gorm:"not null"`
+	Name        string `gorm:"not null"`
+	LastUpdated string `gorm:"not null"`
 	Description string
 	Author      string
 	Environment string
@@ -15,27 +17,22 @@ type Meta struct {
 }
 
 type MetaModel struct {
-	DB *sql.DB
+	DB *gorm.DB
 }
 
-type MetalModelInterface interface{}
-
 func (m *MetaModel) InsertMeta(md Meta) error {
-	query := `
-    INSERT INTO meta (version, name, last_updated, description, author, environment, build_number, license) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-
-	_, err := m.DB.Exec(query, md.Version, md.Name, md.LastUpdated, md.Description, md.Author, md.Environment, md.BuildNumber, md.License)
-	return err
+	result := m.DB.Create(&md)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }
 
 func (m *MetaModel) GetMostRecentMeta() (*Meta, error) {
 	var meta Meta
-	query := `SELECT id, version, name, last_updated, description, author, environment, build_number, license FROM meta ORDER BY id DESC LIMIT 1`
-	row := m.DB.QueryRow(query)
-	err := row.Scan(&meta.ID, &meta.Version, &meta.Name, &meta.LastUpdated, &meta.Description, &meta.Author, &meta.Environment, &meta.BuildNumber, &meta.License)
-	if err != nil {
-		return nil, err
+	result := m.DB.Order("id desc").First(&meta)
+	if result.Error != nil {
+		return nil, result.Error
 	}
 	return &meta, nil
 }

@@ -3,18 +3,26 @@ package main
 import (
 	"database/sql"
 	"flag"
+	"log"
 	"log/slog"
 	"net/http"
 	"os"
 	"time"
 
-	"github.com/alexedwards/scs/sqlite3store"
+	"github.com/alexedwards/scs/gormstore"
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-playground/form/v4"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/timenglesf/personal-site/internal/models"
 	"github.com/timenglesf/personal-site/ui/template"
+)
+
+const (
+	sessionUserId  = "authenticatedUserID"
+	sessionIsAdmin = "isAdmin"
 )
 
 var version = "1.0.0"
@@ -25,7 +33,7 @@ type application struct {
 	meta             *models.MetaModel
 	user             *models.UserModel
 	post             *models.PostModel
-	db               *sql.DB
+	db               *gorm.DB
 	sessionManager   *scs.SessionManager
 	formDecoder      *form.Decoder
 	pageTemplates    *template.Pages
@@ -42,7 +50,7 @@ type config struct {
 func main() {
 	var cfg config
 	flag.StringVar(&cfg.port, "port", os.Getenv("port"), "HTTP server port")
-	flag.StringVar(&cfg.db.dsn, "db-dsn", "./db/app.db", "SQLite3 DSN")
+	flag.StringVar(&cfg.db.dsn, "db-dsn", "./app.db", "SQLite3 DSN")
 
 	flag.Parse()
 
@@ -52,17 +60,29 @@ func main() {
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	db, err := openDB(cfg.db.dsn)
+	//	db, err := openDB(cfg.db.dsn)
+	//	if err != nil {
+	//		logger.Error("Unable to open database", "error", err)
+	//		os.Exit(1)
+	//	}
+	//	defer db.Close()
+	db, err := gorm.Open(sqlite.Open(cfg.db.dsn), &gorm.Config{})
 	if err != nil {
-		logger.Error("Unable to open database", "error", err)
-		os.Exit(1)
+		panic("failed to connect database")
 	}
-	defer db.Close()
+
+	err = db.AutoMigrate(&models.User{}, &models.Post{}, &models.Tag{}, &models.Meta{})
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	logger.Info("Successfully connected to the database", "dsn", cfg.db.dsn)
 
 	sessionManager := scs.New()
-	sessionManager.Store = sqlite3store.New(db)
+	sessionManager.Store, err = gormstore.New(db)
+	if err != nil {
+		log.Fatal(err)
+	}
 	sessionManager.Lifetime = 24 * 7 * time.Hour
 
 	// Initialize form decoder
@@ -111,10 +131,20 @@ func main() {
 		}
 	}
 
+	srv := &http.Server{
+		Addr:         ":" + cfg.port,
+		Handler:      app.routes(),
+		ErrorLog:     slog.NewLogLogger(logger.Handler(), slog.LevelError),
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	}
+
 	app.logger.Info("Successfully fetched meta", "meta", fetchedMeta)
 
 	logger.Info("Starting the server", "port", cfg.port)
-	err = http.ListenAndServe(":"+cfg.port, app.routes())
+	err = srv.ListenAndServe()
+	// :err = http.ListenAndServe(":"+cfg.port, app.routes())
 	logger.Error("Server error", "error", err.Error())
 	os.Exit(1)
 }

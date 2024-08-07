@@ -8,22 +8,22 @@ import (
 	"strconv"
 )
 
-templ blogPostData(b *models.Post) {
+templ DashboardBlogPostRow(b *models.Post) {
 	<tr>
 		<td><a href={ templ.SafeURL("/posts/view/" + url.QueryEscape(b.Title)) }></a>{ b.Title }</td>
 		<td>{ b.CreatedAt.Format(shared.DateLayout) }</td>
 		<td>
 			<label>
 				if b.Private {
-					<input type="checkbox" class="checkbox" checked/>
+					<input type="checkbox" class="checkbox" hx-post={ "/posts/update/" + url.QueryEscape(b.Title) + "?private=" + strconv.FormatBool(b.Private) } checked/>
 				} else {
-					<input type="checkbox" class="checkbox"/>
+					<input type="checkbox" class="checkbox" hx-post={ "/posts/update/" + url.QueryEscape(b.Title) + "?private=" + strconv.FormatBool(b.Private) }/>
 				}
 			</label>
 		</td>
 		<td>
-			<button type="button" class="btn btn-accent text-primary-content" hx-post="">Update</button>
-			<button type="button" class="btn btn-secondary text-primary-content">View</button>
+			<button type="button" class="btn btn-accent text-primary-content">Update</button>
+			<a href={ templ.SafeURL("/posts/view/" + url.QueryEscape(b.Title)) }><button type="button" class="btn btn-secondary text-primary-content">View</button></a>
 		</td>
 	</tr>
 }
@@ -58,7 +58,7 @@ templ AdminDashboard(d *shared.TemplateData) {
 			</thead>
 			<tbody>
 				for _, post := range d.BlogPosts {
-					@blogPostData(&post)
+					@DashboardBlogPostRow(&post)
 				}
 			</tbody>
 		</table>

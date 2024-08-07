@@ -3,11 +3,9 @@ package pages
 import (
 	"github.com/timenglesf/personal-site/internal/shared"
 	"time"
-	"fmt"
 )
 
 func ShouldShowUpdatedAt(createdAt, updatedAt time.Time) bool {
-	fmt.Println("ShouldShowUpdatedAt")
 	return updatedAt.Sub(createdAt) >= 6*time.Hour
 }
 
@@ -21,6 +19,6 @@ templ Post(d *shared.TemplateData) {
 		<p class="date">Last updated: { d.BlogPost.UpdatedAt.Weekday().String() } { d.BlogPost.UpdatedAt.Format(shared.DateLayout) }</p>
 	}
 	<div class="updated">
-		@shared.Unsafe(d.BlogPost.ContentHTML)
+		@shared.Unsafe(d.BlogPost.Content)
 	</div>
 }

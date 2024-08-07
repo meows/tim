@@ -4,15 +4,18 @@ import (
 	"net/http"
 
 	"github.com/justinas/alice"
+	"github.com/timenglesf/personal-site/ui"
 )
 
 func (app *application) routes() http.Handler {
 	mux := http.NewServeMux()
 
-	fileServer := http.FileServer(http.Dir("./ui/static/"))
-	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
+	// fileServer := http.FileServer(http.Dir("./ui/static/"))
+	fileServer := http.FileServerFS(ui.Files)
+	//	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
+	mux.Handle("/static/", fileServer)
 
-	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf)
+	dynamic := alice.New(app.sessionManager.LoadAndSave, app.noSurf)
 	mux.Handle("GET /{$}", dynamic.ThenFunc(app.home))
 
 	// Posts
@@ -20,9 +23,13 @@ func (app *application) routes() http.Handler {
 	mux.Handle("GET /posts/latest", dynamic.ThenFunc(app.handleGetLatestBlogPosts))
 
 	adminProtected := dynamic.Append(app.requireAdmin)
-	// Admin routes
-	mux.Handle("POST /posts/create", dynamic.ThenFunc(app.handleCreateBlogPost))
+	// Protected Post routes
+
+	mux.Handle("POST /posts/create", adminProtected.ThenFunc(app.handleCreateBlogPost))
 	mux.Handle("GET /posts/create", adminProtected.ThenFunc(app.handleDisplayCreatePostForm))
+	mux.Handle("POST /posts/update/{slug}", adminProtected.ThenFunc(app.handleBlogPostUpdate))
+	// Admin routes
+	//
 
 	mux.Handle("GET /admin/{$}", dynamic.ThenFunc(app.handleDisplayAdminPage))
 	mux.Handle("GET /admin/signup", dynamic.ThenFunc(app.handleAdminSignupPage))

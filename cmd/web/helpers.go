@@ -103,3 +103,12 @@ func (app *application) renderPage(w http.ResponseWriter, r *http.Request, templ
 		app.serverError(w, r, err)
 	}
 }
+
+func (app *application) renderBlogPostPage(w http.ResponseWriter, r *http.Request, title string, data *shared.TemplateData) {
+	page := app.pageTemplates.Post(data)
+	base := app.pageTemplates.PostBase("Tim Engle Blog - "+title, page, data)
+	err := base.Render(r.Context(), w)
+	if err != nil {
+		app.serverError(w, r, err)
+	}
+}

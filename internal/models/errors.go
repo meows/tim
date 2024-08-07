@@ -14,4 +14,8 @@ var (
 	ErrDuplicateEmail = errors.New("models: duplicate email")
 
 	ErrDuplicateAdmin = errors.New("models: duplicate admin")
+
+	ErrDuplicateTitle = errors.New("models: duplicate title")
+
+	ErrUpdateUser = errors.New("models: update user error")
 )
