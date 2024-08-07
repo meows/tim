@@ -1,5 +1,6 @@
 db/app.db
 db/migrations/*.sql
+app.db
 
 # Binaries for programs and plugins
 *.exe

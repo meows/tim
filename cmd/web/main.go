@@ -3,14 +3,17 @@ package main
 import (
 	"database/sql"
 	"flag"
+	"log"
 	"log/slog"
 	"net/http"
 	"os"
 	"time"
 
-	"github.com/alexedwards/scs/sqlite3store"
+	"github.com/alexedwards/scs/gormstore"
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-playground/form/v4"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/timenglesf/personal-site/internal/models"
@@ -25,7 +28,7 @@ type application struct {
 	meta             *models.MetaModel
 	user             *models.UserModel
 	post             *models.PostModel
-	db               *sql.DB
+	db               *gorm.DB
 	sessionManager   *scs.SessionManager
 	formDecoder      *form.Decoder
 	pageTemplates    *template.Pages
@@ -42,7 +45,7 @@ type config struct {
 func main() {
 	var cfg config
 	flag.StringVar(&cfg.port, "port", os.Getenv("port"), "HTTP server port")
-	flag.StringVar(&cfg.db.dsn, "db-dsn", "./db/app.db", "SQLite3 DSN")
+	flag.StringVar(&cfg.db.dsn, "db-dsn", "./app.db", "SQLite3 DSN")
 
 	flag.Parse()
 
@@ -52,17 +55,24 @@ func main() {
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	db, err := openDB(cfg.db.dsn)
+	//	db, err := openDB(cfg.db.dsn)
+	//	if err != nil {
+	//		logger.Error("Unable to open database", "error", err)
+	//		os.Exit(1)
+	//	}
+	//	defer db.Close()
+	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	if err != nil {
-		logger.Error("Unable to open database", "error", err)
-		os.Exit(1)
+		panic("failed to connect database")
 	}
-	defer db.Close()
 
 	logger.Info("Successfully connected to the database", "dsn", cfg.db.dsn)
 
 	sessionManager := scs.New()
-	sessionManager.Store = sqlite3store.New(db)
+	sessionManager.Store, err = gormstore.New(db)
+	if err != nil {
+		log.Fatal(err)
+	}
 	sessionManager.Lifetime = 24 * 7 * time.Hour
 
 	// Initialize form decoder
