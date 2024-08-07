@@ -33,7 +33,6 @@ func (app *application) handleCreateBlogPost(w http.ResponseWriter, r *http.Requ
 
 	err := app.decodeForm(r, &form)
 	if err != nil {
-		fmt.Println(err)
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
@@ -87,7 +86,6 @@ func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request
 		if !app.isAdmin(r) {
 			app.logger.Warn("unauthorized access to url", "url", r.URL.Path, "ip", r.RemoteAddr)
 			referer := r.Referer()
-			fmt.Println(referer)
 			if referer != "" {
 				http.Redirect(w, r, referer, http.StatusSeeOther)
 			} else {
@@ -99,7 +97,6 @@ func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request
 
 	data := app.newTemplateData(r)
 	data.BlogPost = *post
-	fmt.Println(data.BlogPost)
 
 	// convert markdown to html
 	var buf bytes.Buffer

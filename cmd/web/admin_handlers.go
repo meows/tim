@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -50,7 +49,6 @@ func (app *application) handleDisplayAdminPage(w http.ResponseWriter, r *http.Re
 	data.BlogPosts = recentPosts
 	data.TotalPostCount = int(totalPosts)
 	data.CurrentPage = 1
-	fmt.Println("recentPosts: ", recentPosts)
 	app.renderPage(w, r, app.pageTemplates.AdminDashboard, "Dashboard", &data)
 }
 
@@ -119,9 +117,7 @@ func (app *application) handleAdminSignupPost(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	id, err := app.user.Insert(form.DisplayName, form.Email, string(hashedPassword), true)
-
-	fmt.Println("id: ", id)
+	_, err = app.user.Insert(form.DisplayName, form.Email, string(hashedPassword), true)
 	if err != nil {
 		if errors.Is(err, models.ErrDuplicateAdmin) {
 			app.sessionManager.Put(r.Context(), "flashError", "Creating admin")
@@ -134,8 +130,6 @@ func (app *application) handleAdminSignupPost(w http.ResponseWriter, r *http.Req
 			return
 		}
 	}
-
-	fmt.Println(id)
 
 	app.sessionManager.Put(r.Context(), "flashSuccess", "Admin account created successfully")
 	http.Redirect(w, r, "/admin/login", http.StatusSeeOther)
@@ -189,8 +183,7 @@ func (app *application) handleAdminLoginPost(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	admin, err := app.user.GetAdmin()
-	if err != nil {
+	if _, err = app.user.GetAdmin(); err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
 			data := app.newTemplateData(r)
 			data.Flash = &shared.FlashMessage{Message: "Admin does not exist", Type: "warning"}
@@ -203,31 +196,26 @@ func (app *application) handleAdminLoginPost(w http.ResponseWriter, r *http.Requ
 	data := app.newTemplateData(r)
 	data.LoginForm = form
 
-	targetUser, err := app.user.GetByEmail(strings.ToLower(form.Email))
+	user, err := app.user.Authenticate(form.Email, form.Password, true)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
 			displayAdminLoginWithInvalidCredAlert(app, w, r, &data)
 			return
 		}
+		if errors.Is(err, models.ErrInvalidCredentials) {
+			displayAdminLoginWithInvalidCredAlert(app, w, r, &data)
+			return
+		}
+		if errors.Is(err, models.ErrUpdateUser) {
+			app.logger.Error("Error updating user", "error", err)
+		}
 	}
-
-	// check if targetUser is equal to the admin
-	if targetUser.ID != admin.ID {
-		displayAdminLoginWithInvalidCredAlert(app, w, r, &data)
-		return
-	}
-
-	if err = bcrypt.CompareHashAndPassword([]byte(targetUser.Password), []byte(form.Password)); err != nil {
-		displayAdminLoginWithInvalidCredAlert(app, w, r, &data)
-		return
-	}
-
 	if err = app.sessionManager.RenewToken(r.Context()); err != nil {
 		app.serverError(w, r, err)
 		return
 	}
 
-	app.sessionManager.Put(r.Context(), "authenticatedUserID", targetUser.ID)
+	app.sessionManager.Put(r.Context(), "authenticatedUserID", user.ID)
 	app.sessionManager.Put(r.Context(), "isAdminRole", true)
 
 	http.Redirect(w, r, "/admin", http.StatusSeeOther)

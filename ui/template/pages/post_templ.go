@@ -11,13 +11,11 @@ import "io"
 import "bytes"
 
 import (
-	"fmt"
 	"github.com/timenglesf/personal-site/internal/shared"
 	"time"
 )
 
 func ShouldShowUpdatedAt(createdAt, updatedAt time.Time) bool {
-	fmt.Println("ShouldShowUpdatedAt")
 	return updatedAt.Sub(createdAt) >= 6*time.Hour
 }
 
@@ -41,7 +39,7 @@ func Post(d *shared.TemplateData) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(d.BlogPost.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/template/pages/post.templ`, Line: 15, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/template/pages/post.templ`, Line: 13, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -64,7 +62,7 @@ func Post(d *shared.TemplateData) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(d.BlogPost.CreatedAt.Weekday().String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/template/pages/post.templ`, Line: 19, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/template/pages/post.templ`, Line: 17, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -77,7 +75,7 @@ func Post(d *shared.TemplateData) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(d.BlogPost.CreatedAt.Format(shared.DateLayout))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/template/pages/post.templ`, Line: 19, Col: 109}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/template/pages/post.templ`, Line: 17, Col: 109}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -95,7 +93,7 @@ func Post(d *shared.TemplateData) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(d.BlogPost.UpdatedAt.Weekday().String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/template/pages/post.templ`, Line: 21, Col: 73}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/template/pages/post.templ`, Line: 19, Col: 73}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -108,7 +106,7 @@ func Post(d *shared.TemplateData) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(d.BlogPost.UpdatedAt.Format(shared.DateLayout))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/template/pages/post.templ`, Line: 21, Col: 124}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/template/pages/post.templ`, Line: 19, Col: 124}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {

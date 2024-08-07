@@ -3,11 +3,9 @@ package pages
 import (
 	"github.com/timenglesf/personal-site/internal/shared"
 	"time"
-	"fmt"
 )
 
 func ShouldShowUpdatedAt(createdAt, updatedAt time.Time) bool {
-	fmt.Println("ShouldShowUpdatedAt")
 	return updatedAt.Sub(createdAt) >= 6*time.Hour
 }
 
