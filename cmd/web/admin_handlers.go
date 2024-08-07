@@ -48,7 +48,7 @@ func (app *application) handleDisplayAdminPage(w http.ResponseWriter, r *http.Re
 	}
 
 	data.BlogPosts = recentPosts
-	data.TotalPostCount = totalPosts
+	data.TotalPostCount = int(totalPosts)
 	data.CurrentPage = 1
 	fmt.Println("recentPosts: ", recentPosts)
 	app.renderPage(w, r, app.pageTemplates.AdminDashboard, "Dashboard", &data)

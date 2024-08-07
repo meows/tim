@@ -123,7 +123,7 @@ func Post(d *shared.TemplateData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = shared.Unsafe(d.BlogPost.ContentHTML).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = shared.Unsafe(d.BlogPost.Content).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

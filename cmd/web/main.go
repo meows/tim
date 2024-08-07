@@ -20,6 +20,11 @@ import (
 	"github.com/timenglesf/personal-site/ui/template"
 )
 
+const (
+	sessionUserId  = "authenticatedUserID"
+	sessionIsAdmin = "isAdmin"
+)
+
 var version = "1.0.0"
 
 type application struct {
@@ -61,9 +66,14 @@ func main() {
 	//		os.Exit(1)
 	//	}
 	//	defer db.Close()
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(cfg.db.dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
+	}
+
+	err = db.AutoMigrate(&models.User{}, &models.Post{}, &models.Tag{}, &models.Meta{})
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	logger.Info("Successfully connected to the database", "dsn", cfg.db.dsn)

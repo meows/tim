@@ -50,7 +50,10 @@ func (app *application) handleCreateBlogPost(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	id, err := app.post.Insert(form.Title, form.Content, false, 0)
+	// Get author id
+	userId := app.sessionManager.GetString(r.Context(), sessionUserId)
+
+	id, err := app.post.Insert(form.Title, form.Content, false, userId)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -95,7 +98,7 @@ func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request
 	}
 
 	data := app.newTemplateData(r)
-	data.BlogPost = post
+	data.BlogPost = *post
 	fmt.Println(data.BlogPost)
 
 	// convert markdown to html
@@ -106,7 +109,7 @@ func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	data.BlogPost.ContentHTML = buf.String()
+	data.BlogPost.Content = buf.String()
 
 	// Get flash message from session
 	flashSuccess := app.sessionManager.PopString(r.Context(), "flashSuccess")
@@ -173,7 +176,7 @@ func (app *application) handleBlogPostUpdate(w http.ResponseWriter, r *http.Requ
 
 	// Send updated blog post row if this is an updated to the private column
 	if query.Get("private") != "" {
-		updatedRowComponenet := app.partialTemplates.DashboardBlogPostRow(&post)
+		updatedRowComponenet := app.partialTemplates.DashboardBlogPostRow(post)
 		updatedRowComponenet.Render(r.Context(), w)
 	}
 }

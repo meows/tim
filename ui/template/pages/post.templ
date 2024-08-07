@@ -21,6 +21,6 @@ templ Post(d *shared.TemplateData) {
 		<p class="date">Last updated: { d.BlogPost.UpdatedAt.Weekday().String() } { d.BlogPost.UpdatedAt.Format(shared.DateLayout) }</p>
 	}
 	<div class="updated">
-		@shared.Unsafe(d.BlogPost.ContentHTML)
+		@shared.Unsafe(d.BlogPost.Content)
 	</div>
 }
