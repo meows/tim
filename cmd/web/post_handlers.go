@@ -175,7 +175,9 @@ func (app *application) handleBlogPostUpdate(w http.ResponseWriter, r *http.Requ
 	// Send updated blog post row if this is an updated to the private column
 	if query.Get("private") != "" {
 		updatedRowComponenet := app.partialTemplates.DashboardBlogPostRow(post)
-		updatedRowComponenet.Render(r.Context(), w)
+		if err = updatedRowComponenet.Render(r.Context(), w); err != nil {
+			app.serverError(w, r, err)
+		}
 	}
 }
 
@@ -200,6 +202,8 @@ func (app *application) handleDisplayEditPostForm(w http.ResponseWriter, r *http
 	templateData.BlogForm = form
 
 	page := app.pageTemplates.CreatePost(&templateData)
-	page.Render(r.Context(), w)
+	if err = page.Render(r.Context(), w); err != nil {
+		app.serverError(w, r, err)
+	}
 	// app.renderPage(w, r, app.pageTemplates.CreatePost, "Edit Post", &templateData)
 }

@@ -230,7 +230,9 @@ func (app *application) handleAdminLogoutPost(w http.ResponseWriter, r *http.Req
 
 	if !nosurf.VerifyToken(nosurf.Token(r), sentCSRFToken.Value) {
 		alertComponent := app.partialTemplates.AlertError("CSRF token incorrect. Please try again", "", "error-message container max-w-screen-sm mx-auto mb-6")
-		alertComponent.Render(r.Context(), w)
+		if err = alertComponent.Render(r.Context(), w); err != nil {
+			app.serverError(w, r, err)
+		}
 		return
 	}
 

@@ -22,33 +22,27 @@ func (app *application) serverError(w http.ResponseWriter, r *http.Request, err 
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }
 
-func (app *application) logServerError(r *http.Request, err error) {
-	var (
-		method = r.Method
-		uri    = r.URL.RequestURI()
-		trace  = string(debug.Stack())
-	)
-	app.logger.Error(err.Error(), "method", method, "uri", uri, "trace", trace)
-}
-
-func (app *application) logServerWarning(r *http.Request, err error) {
-	var (
-		method = r.Method
-		uri    = r.URL.RequestURI()
-		trace  = string(debug.Stack())
-	)
-	app.logger.Warn(err.Error(), "method", method, "uri", uri, "trace", trace)
-}
+// func (app *application) logServerError(r *http.Request, err error) {
+// 	var (
+// 		method = r.Method
+// 		uri    = r.URL.RequestURI()
+// 		trace  = string(debug.Stack())
+// 	)
+// 	app.logger.Error(err.Error(), "method", method, "uri", uri, "trace", trace)
+// }
+//
+// func (app *application) logServerWarning(r *http.Request, err error) {
+// 	var (
+// 		method = r.Method
+// 		uri    = r.URL.RequestURI()
+// 		trace  = string(debug.Stack())
+// 	)
+// 	app.logger.Warn(err.Error(), "method", method, "uri", uri, "trace", trace)
+// }
 
 func (app *application) clientError(w http.ResponseWriter, status int) {
 	http.Error(w, http.StatusText(status), status)
 }
-
-// func (app *application) newPostTemplateData(r *http.Request) *shared.PostTemplateData {
-// 	return &shared.PostTemplateData{
-// 		CurrentYear: time.Now().Year(),
-// 	}
-// }
 
 func (app *application) newTemplateData(r *http.Request) shared.TemplateData {
 	return shared.TemplateData{

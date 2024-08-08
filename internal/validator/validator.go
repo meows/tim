@@ -59,7 +59,7 @@ func EqualStrings(a, b string) bool {
 
 // EqualEmails() returns true if two email addresses are equal.
 func EqualEmails(a, b string) bool {
-	return strings.ToLower(a) == strings.ToLower(b)
+	return strings.EqualFold(a, b)
 }
 
 // ValidEmail() returns true if the email address is valid.
