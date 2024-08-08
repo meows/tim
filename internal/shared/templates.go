@@ -25,7 +25,7 @@ type TemplateData struct {
 	SignUpForm      AdminSignUpForm
 	LoginForm       AdminLoginForm
 	Flash           *FlashMessage
-	BlogPost        models.Post
+	BlogPost        *models.Post
 	CurrentYear     int
 	TotalPostCount  int
 	CurrentPage     int
