@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 
 	"github.com/justinas/nosurf"
 	"github.com/timenglesf/personal-site/internal/models"
@@ -96,7 +97,7 @@ func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request
 	}
 
 	data := app.newTemplateData(r)
-	data.BlogPost = *post
+	data.BlogPost = post
 
 	// convert markdown to html
 	var buf bytes.Buffer
@@ -174,6 +175,35 @@ func (app *application) handleBlogPostUpdate(w http.ResponseWriter, r *http.Requ
 	// Send updated blog post row if this is an updated to the private column
 	if query.Get("private") != "" {
 		updatedRowComponenet := app.partialTemplates.DashboardBlogPostRow(post)
-		updatedRowComponenet.Render(r.Context(), w)
+		if err = updatedRowComponenet.Render(r.Context(), w); err != nil {
+			app.serverError(w, r, err)
+		}
 	}
+}
+
+func (app *application) handleDisplayEditPostForm(w http.ResponseWriter, r *http.Request) {
+	slug := r.PathValue("slug")
+	id, err := strconv.Atoi(slug)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+	var form shared.BlogPostFormData
+
+	post, err := app.post.GetPostByID(uint(id))
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	templateData := app.newTemplateData(r)
+	form.Title = post.Title
+	form.Content = post.Content
+	templateData.BlogForm = form
+
+	page := app.pageTemplates.CreatePost(&templateData)
+	if err = page.Render(r.Context(), w); err != nil {
+		app.serverError(w, r, err)
+	}
+	// app.renderPage(w, r, app.pageTemplates.CreatePost, "Edit Post", &templateData)
 }

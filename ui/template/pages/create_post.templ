@@ -3,6 +3,7 @@ package pages
 import (
 	"github.com/timenglesf/personal-site/internal/shared"
 	"github.com/timenglesf/personal-site/ui/template/components"
+	"strconv"
 )
 
 templ labelDisplay(val string) {
@@ -10,7 +11,7 @@ templ labelDisplay(val string) {
 }
 
 templ CreatePost(data *shared.TemplateData) {
-	<main class="container mx-auto h-[calc(100vh-144px)]">
+	<div class="container mx-auto h-[calc(100vh-144px)]">
 		<div class="mx-auto w-2/3 h-full flex flex-col">
 			if data.BlogForm.FieldErrors["title"] != "" {
 				@components.WarningAlert(data.BlogForm.FieldErrors["title"], "title_warning", "mb-6")
@@ -18,7 +19,15 @@ templ CreatePost(data *shared.TemplateData) {
 			if data.BlogForm.FieldErrors["content"] != "" && data.BlogForm.FieldErrors["title"] == "" {
 				@components.WarningAlert(data.BlogForm.FieldErrors["content"], "content_warning", "mb-6")
 			}
-			<form class="flex flex-col h-full" action="/posts/create" method="post">
+			<form
+				class="flex flex-col h-full"
+				if data.BlogPost != nil {
+					action="/posts/create"
+				} else {
+					action="/posts/edit"
+				}
+				method="post"
+			>
 				<div class="flex flex-col justify-start mb-4">
 					@labelDisplay("Title:")
 					@components.TitleInputDisplay(data.BlogForm.Title)
@@ -30,10 +39,13 @@ templ CreatePost(data *shared.TemplateData) {
 					<input type="hidden" name="csrf_token" value={ data.CSRFToken }/>
 				</div>
 				<div class="mt-4">
+					if data.BlogPost != nil {
+						<input type="hidden" name="post_id" value={ strconv.Itoa(int(data.BlogPost.ID)) }/>
+					}
 					<button class="btn btn-primary" type="submit">Create Post</button>
 					<button class="btn btn-accent text-primary-content" type="button">Preview</button>
 				</div>
 			</form>
 		</div>
-	</main>
+	</div>
 }

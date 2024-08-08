@@ -97,3 +97,15 @@ func (m *PostModel) Update(p *Post) error {
 	}
 	return nil
 }
+
+func (m *PostModel) GetPostByID(id uint) (*Post, error) {
+	var p Post
+	result := m.DB.Preload("Tags").Preload("Categories").First(&p, id)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return nil, ErrNoRecord
+		}
+		return nil, result.Error
+	}
+	return &p, nil
+}

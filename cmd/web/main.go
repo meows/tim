@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"flag"
 	"log"
 	"log/slog"
@@ -25,7 +24,7 @@ const (
 	sessionIsAdmin = "isAdmin"
 )
 
-var version = "1.0.0"
+var version = "0.0.0"
 
 type application struct {
 	logger           *slog.Logger
@@ -107,7 +106,7 @@ func main() {
 	}
 
 	meta := models.Meta{
-		Version:     "0.0.0",
+		Version:     version,
 		Name:        "personal-site",
 		LastUpdated: "2024-07-22",
 		Description: "A simple web application",
@@ -147,16 +146,4 @@ func main() {
 	// :err = http.ListenAndServe(":"+cfg.port, app.routes())
 	logger.Error("Server error", "error", err.Error())
 	os.Exit(1)
-}
-
-func openDB(dsn string) (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", dsn)
-	if err != nil {
-		return nil, err
-	}
-	if err := db.Ping(); err != nil {
-		return nil, err
-	}
-
-	return db, nil
 }
