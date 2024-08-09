@@ -29,6 +29,7 @@ func (app *application) routes() http.Handler {
 	mux.Handle("GET /posts/create", adminProtected.ThenFunc(app.handleDisplayCreatePostForm))
 	mux.Handle("POST /posts/update/{slug}", adminProtected.ThenFunc(app.handleBlogPostUpdate))
 	mux.Handle("GET /posts/edit/{slug}", adminProtected.ThenFunc(app.handleDisplayEditPostForm))
+	mux.Handle("POST /posts/edit", adminProtected.ThenFunc(app.handleBlogPostEdit))
 	// Admin routes
 	//
 

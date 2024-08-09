@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"reflect"
 	"strconv"
 
 	"github.com/justinas/nosurf"
@@ -188,7 +189,6 @@ func (app *application) handleDisplayEditPostForm(w http.ResponseWriter, r *http
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
-	var form shared.BlogPostFormData
 
 	post, err := app.post.GetPostByID(uint(id))
 	if err != nil {
@@ -196,14 +196,63 @@ func (app *application) handleDisplayEditPostForm(w http.ResponseWriter, r *http
 		return
 	}
 
-	templateData := app.newTemplateData(r)
+	var form shared.BlogPostFormData
 	form.Title = post.Title
 	form.Content = post.Content
-	templateData.BlogForm = form
 
-	page := app.pageTemplates.CreatePost(&templateData)
+	templateData := app.newTemplateData(r)
+	templateData.BlogForm = form
+	templateData.BlogPost = post
+
+	page := app.pageTemplates.EditPost(&templateData)
 	if err = page.Render(r.Context(), w); err != nil {
+		fmt.Println(err)
 		app.serverError(w, r, err)
 	}
-	// app.renderPage(w, r, app.pageTemplates.CreatePost, "Edit Post", &templateData)
+}
+
+func (app *application) handleBlogPostEdit(w http.ResponseWriter, r *http.Request) {
+	var form struct {
+		shared.BlogPostFormData
+		ID uint `form:"id"`
+	}
+	if err := app.decodeForm(r, &form); err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	var blogFormData shared.BlogPostFormData
+	blogFormData.Title = form.Title
+	blogFormData.Content = form.Content
+
+	// Validate form data
+	blogFormData.CheckField(validator.NotBlank(form.Title), "title", "Title is required")
+	blogFormData.CheckField(validator.MaxChars(form.Title, 100), "title", "This field is too long (maximum is 100 characters)")
+	blogFormData.CheckField(validator.NotBlank(form.Content), "content", "Content is required")
+
+	data := app.newTemplateData(r)
+	data.BlogForm = blogFormData
+
+	if !blogFormData.Valid() {
+		data.BlogPost = &models.Post{}
+		data.BlogPost.ID = form.ID
+		page := app.pageTemplates.EditPost(&data)
+		if err := page.Render(r.Context(), w); err != nil {
+			app.serverError(w, r, err)
+		}
+		return
+	}
+
+	// TODO: Update post in db and redirect to view post
+}
+
+func printTemplateData(templateData interface{}) {
+	v := reflect.ValueOf(templateData)
+	t := v.Type()
+
+	for i := 0; i < v.NumField(); i++ {
+		field := t.Field(i)
+		value := v.Field(i).Interface()
+		fmt.Printf("Key: %s, Value: %v\n", field.Name, value)
+	}
 }
