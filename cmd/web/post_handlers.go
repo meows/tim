@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"reflect"
 	"strconv"
 
 	"github.com/justinas/nosurf"
@@ -244,15 +243,4 @@ func (app *application) handleBlogPostEdit(w http.ResponseWriter, r *http.Reques
 	}
 
 	// TODO: Update post in db and redirect to view post
-}
-
-func printTemplateData(templateData interface{}) {
-	v := reflect.ValueOf(templateData)
-	t := v.Type()
-
-	for i := 0; i < v.NumField(); i++ {
-		field := t.Field(i)
-		value := v.Field(i).Interface()
-		fmt.Printf("Key: %s, Value: %v\n", field.Name, value)
-	}
 }
