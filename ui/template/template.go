@@ -19,6 +19,7 @@ type Pages struct {
 	EditPost       func(data *shared.TemplateData) templ.Component
 	AdminLogin     func(data *shared.TemplateData) templ.Component
 	AdminDashboard func(data *shared.TemplateData) templ.Component
+	About          func(data *shared.TemplateData) templ.Component
 }
 
 type Partials struct {
@@ -42,6 +43,7 @@ func CreatePageTemplates() *Pages {
 		CreatePost:     pages.CreatePost,
 		EditPost:       pages.EditPost,
 		AdminDashboard: pages.AdminDashboard,
+		About:          pages.AboutPage,
 	}
 }
 

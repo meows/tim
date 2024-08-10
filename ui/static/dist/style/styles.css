@@ -832,14 +832,23 @@ html {
   --border-btn: 1px;
   --tab-border: 1px;
   --tab-radius: 0.5rem;
+  primary-focus: #3a5260;
   --s: 69.6425% 0.10529 190.239196;
+  secondary-focus: #2e958f;
   --a: 65.133% 0.078682 229.001366;
+  accent-focus: #487d95;
   --n: 97.0151% 0 0;
+  neutral-focus: #e0e0e0;
   --b1: 73.3739% 0.037405 292.511235;
+  base-100-focus: #8e8aa3;
   --in: 62.3083% 0.188015 259.814527;
+  info-focus: #3169c4;
   --su: 69.5873% 0.149074 162.479602;
+  success-focus: #0e9668;
   --wa: 76.859% 0.164659 70.08039;
+  warning-focus: #c47f09;
   --er: 63.6834% 0.207849 25.331328;
+  error-focus: #c03636;
 }
 
 :root:has(input.theme-controller[value=mytheme]:checked) {
@@ -864,14 +873,23 @@ html {
   --border-btn: 1px;
   --tab-border: 1px;
   --tab-radius: 0.5rem;
+  primary-focus: #3a5260;
   --s: 69.6425% 0.10529 190.239196;
+  secondary-focus: #2e958f;
   --a: 65.133% 0.078682 229.001366;
+  accent-focus: #487d95;
   --n: 97.0151% 0 0;
+  neutral-focus: #e0e0e0;
   --b1: 73.3739% 0.037405 292.511235;
+  base-100-focus: #8e8aa3;
   --in: 62.3083% 0.188015 259.814527;
+  info-focus: #3169c4;
   --su: 69.5873% 0.149074 162.479602;
+  success-focus: #0e9668;
   --wa: 76.859% 0.164659 70.08039;
+  warning-focus: #c47f09;
   --er: 63.6834% 0.207849 25.331328;
+  error-focus: #c03636;
 }
 
 *, ::before, ::after {
@@ -2350,6 +2368,10 @@ html {
   height: 2.5rem;
 }
 
+.h-14 {
+  height: 3.5rem;
+}
+
 .h-24 {
   height: 6rem;
 }
@@ -2406,6 +2428,10 @@ html {
   width: 1.5rem;
 }
 
+.w-60 {
+  width: 15rem;
+}
+
 .max-w-2xl {
   max-width: 42rem;
 }
@@ -2450,8 +2476,16 @@ html {
   justify-content: flex-start;
 }
 
+.justify-center {
+  justify-content: center;
+}
+
 .gap-2 {
   gap: 0.5rem;
+}
+
+.gap-4 {
+  gap: 1rem;
 }
 
 .space-x-4 > :not([hidden]) ~ :not([hidden]) {
@@ -2487,8 +2521,21 @@ html {
   background-color: var(--fallback-n,oklch(var(--n)/var(--tw-bg-opacity)));
 }
 
+.bg-primary {
+  --tw-bg-opacity: 1;
+  background-color: var(--fallback-p,oklch(var(--p)/var(--tw-bg-opacity)));
+}
+
+.fill-base-100 {
+  fill: var(--fallback-b1,oklch(var(--b1)/1));
+}
+
 .fill-current {
   fill: currentColor;
+}
+
+.fill-secondary {
+  fill: var(--fallback-s,oklch(var(--s)/1));
 }
 
 .stroke-current {
@@ -2561,6 +2608,10 @@ html {
 
 .duration-300 {
   transition-duration: 300ms;
+}
+
+.hover\:fill-\[\#8e8aa3\]:hover {
+  fill: #8e8aa3;
 }
 
 .hover\:text-primary:hover {
