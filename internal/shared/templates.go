@@ -17,20 +17,21 @@ type FlashMessage struct {
 }
 
 type TemplateData struct {
-	BlogPosts       []models.Post
-	CSRFToken       string
-	BaseURL         string
-	User            models.User
-	BlogForm        BlogPostFormData
-	SignUpForm      AdminSignUpForm
-	LoginForm       AdminLoginForm
-	Flash           *FlashMessage
-	BlogPost        *models.Post
-	CurrentYear     int
-	TotalPostCount  int
-	CurrentPage     int
-	IsAuthenticated bool
-	IsAdmin         bool
+	BlogPosts            []models.Post
+	CSRFToken            string
+	BaseURL              string
+	User                 models.User
+	BlogForm             BlogPostFormData
+	SignUpForm           AdminSignUpForm
+	LoginForm            AdminLoginForm
+	Flash                *FlashMessage
+	BlogPost             *models.Post
+	MostRecentPublicPost *models.Post
+	CurrentYear          int
+	TotalPostCount       int
+	CurrentPage          int
+	IsAuthenticated      bool
+	IsAdmin              bool
 }
 
 // Form data

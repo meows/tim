@@ -46,12 +46,14 @@ func (app *application) clientError(w http.ResponseWriter, status int) {
 
 func (app *application) newTemplateData(r *http.Request) shared.TemplateData {
 	return shared.TemplateData{
-		IsAuthenticated: app.isAuthenticated(r),
-		IsAdmin:         app.isAdmin(r),
-		CurrentYear:     time.Now().Year(),
-		CSRFToken:       nosurf.Token(r),
-		BaseURL:         app.getBaseURLString(r),
-		Flash:           &shared.FlashMessage{},
+		IsAuthenticated:      app.isAuthenticated(r),
+		IsAdmin:              app.isAdmin(r),
+		CurrentYear:          time.Now().Year(),
+		CSRFToken:            nosurf.Token(r),
+		BaseURL:              app.getBaseURLString(r),
+		Flash:                &shared.FlashMessage{},
+		MostRecentPublicPost: app.mostRecentPost,
+		BlogPosts:            *app.latestPublicPosts,
 	}
 }
 
@@ -105,4 +107,20 @@ func (app *application) renderBlogPostPage(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		app.serverError(w, r, err)
 	}
+}
+
+func (app *application) UpdatePostsOnAppStruct() error {
+	mostRecentPublicPost, err := app.post.MostRecentPost(false)
+	if err != nil {
+		return err
+	}
+
+	latestPublicPosts, err := app.post.LatestPosts(false)
+	if err != nil {
+		return err
+	}
+
+	app.latestPublicPosts = &latestPublicPosts
+	app.mostRecentPost = mostRecentPublicPost
+	return nil
 }

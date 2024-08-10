@@ -59,9 +59,20 @@ func (app *application) handleCreateBlogPost(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	app.sessionManager.Put(r.Context(), "flashSuccess", "Post succesfully created!")
+	// Reset mostRecentPublicPost & latestPublicPosts app field
+	if err := app.UpdatePostsOnAppStruct(); err != nil {
+		app.serverError(w, r, err)
+	}
 
-	http.Redirect(w, r, fmt.Sprintf("/post/view/%d", id), http.StatusSeeOther)
+	// Redirect to view of newly created post
+	createdPost, err := app.post.GetPostByID(id)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	app.sessionManager.Put(r.Context(), "flashSuccess", "Post succesfully created!")
+	http.Redirect(w, r, fmt.Sprintf("/post/view/%s", url.QueryEscape(createdPost.Title)), http.StatusSeeOther)
 }
 
 // Render blog Post by Title
@@ -120,7 +131,7 @@ func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request
 }
 
 func (app *application) handleGetLatestBlogPosts(w http.ResponseWriter, r *http.Request) {
-	posts, err := app.post.Latest(false)
+	posts, err := app.post.LatestPosts(false)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -170,6 +181,11 @@ func (app *application) handleBlogPostUpdate(w http.ResponseWriter, r *http.Requ
 	if err := app.post.Update(post); err != nil {
 		app.serverError(w, r, err)
 		return
+	}
+
+	// Reset mostRecentPublicPost & latestPublicPosts app field
+	if err := app.UpdatePostsOnAppStruct(); err != nil {
+		app.serverError(w, r, err)
 	}
 
 	// Send updated blog post row if this is an updated to the private column
