@@ -24,7 +24,7 @@ templ PageHeader(d *shared.TemplateData) {
 					@navLink("/about", "About")
 					@navLink("/contact", "Contact")
 					if  d.IsAuthenticated {
-						@navLink("/admin", "Admin")
+						@navLink("/admin", "Dashboard")
 					}
 				</ul>
 			</nav>

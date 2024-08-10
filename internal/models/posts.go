@@ -64,7 +64,7 @@ func (m *PostModel) GetPostByTitle(title string) (*Post, error) {
 
 func (m *PostModel) Latest(includePrivatePosts bool) ([]Post, error) {
 	var posts []Post
-	result := m.DB.Preload("Tags").Preload("Categories").Order("created_at DESC").Limit(10).Find(&posts)
+	result := m.DB.Preload("Tags").Preload("Categories").Where("private = ?", includePrivatePosts).Order("created_at DESC").Limit(10).Find(&posts)
 	if result.Error != nil {
 		return nil, result.Error
 	}
