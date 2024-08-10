@@ -1,3 +1,4 @@
+.post-page {
 @media print {
   *,
   *:before,
@@ -210,4 +211,4 @@ pre {
   overflow-x: scroll;
 }
 
-
+}
