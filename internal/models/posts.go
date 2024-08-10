@@ -62,13 +62,22 @@ func (m *PostModel) GetPostByTitle(title string) (*Post, error) {
 	return &p, nil
 }
 
-func (m *PostModel) Latest(includePrivatePosts bool) ([]Post, error) {
+func (m *PostModel) LatestPosts(includePrivatePosts bool) ([]Post, error) {
 	var posts []Post
 	result := m.DB.Preload("Tags").Preload("Categories").Where("private = ?", includePrivatePosts).Order("created_at DESC").Limit(10).Find(&posts)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 	return posts, nil
+}
+
+func (m *PostModel) MostRecentPost(includePrivatePosts bool) (*Post, error) {
+	var post Post
+	result := m.DB.Preload("Tags").Preload("Categories").Where("private = ?", includePrivatePosts).Order("created_at DESC").First(&post)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &post, nil
 }
 
 func (m *PostModel) GetPosts(includePrivatePosts bool, page int, pageSize int) ([]Post, error) {

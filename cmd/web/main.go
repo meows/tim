@@ -27,16 +27,18 @@ const (
 var version = "0.0.0"
 
 type application struct {
-	logger           *slog.Logger
-	cfg              *config
-	meta             *models.MetaModel
-	user             *models.UserModel
-	post             *models.PostModel
-	db               *gorm.DB
-	sessionManager   *scs.SessionManager
-	formDecoder      *form.Decoder
-	pageTemplates    *template.Pages
-	partialTemplates *template.Partials
+	logger            *slog.Logger
+	cfg               *config
+	meta              *models.MetaModel
+	user              *models.UserModel
+	post              *models.PostModel
+	db                *gorm.DB
+	sessionManager    *scs.SessionManager
+	formDecoder       *form.Decoder
+	pageTemplates     *template.Pages
+	partialTemplates  *template.Partials
+	mostRecentPost    *models.Post
+	latestPublicPosts *[]models.Post
 }
 
 type config struct {
@@ -59,12 +61,6 @@ func main() {
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	//	db, err := openDB(cfg.db.dsn)
-	//	if err != nil {
-	//		logger.Error("Unable to open database", "error", err)
-	//		os.Exit(1)
-	//	}
-	//	defer db.Close()
 	db, err := gorm.Open(sqlite.Open(cfg.db.dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
@@ -105,6 +101,11 @@ func main() {
 		partialTemplates: partialTemplates,
 	}
 
+	// Reset mostRecentPublicPost & latestPublicPosts app field
+	if err := app.UpdatePostsOnAppStruct(); err != nil {
+		app.logger.Error("Unable to update posts on app struct", "error", err)
+	}
+
 	meta := models.Meta{
 		Version:     version,
 		Name:        "personal-site",
@@ -118,7 +119,7 @@ func main() {
 
 	fetchedMeta, err := app.meta.GetMostRecentMeta()
 	if err != nil {
-		logger.Error("Unable to fetch most recent meta", "error", err)
+		app.logger.Error("Unable to fetch most recent meta", "error", err)
 	}
 
 	if fetchedMeta == nil || fetchedMeta.Version != meta.Version || fetchedMeta.LastUpdated != meta.LastUpdated {
@@ -143,7 +144,6 @@ func main() {
 
 	logger.Info("Starting the server", "port", cfg.port)
 	err = srv.ListenAndServe()
-	// :err = http.ListenAndServe(":"+cfg.port, app.routes())
 	logger.Error("Server error", "error", err.Error())
 	os.Exit(1)
 }
