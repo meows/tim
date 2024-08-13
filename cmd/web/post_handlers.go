@@ -72,7 +72,7 @@ func (app *application) handleCreateBlogPost(w http.ResponseWriter, r *http.Requ
 	}
 
 	app.sessionManager.Put(r.Context(), "flashSuccess", "Post succesfully created!")
-	http.Redirect(w, r, fmt.Sprintf("/post/view/%s", url.QueryEscape(createdPost.Title)), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/posts/view/%s", url.QueryEscape(createdPost.Title)), http.StatusSeeOther)
 }
 
 // Render blog Post by Title
@@ -259,4 +259,28 @@ func (app *application) handleBlogPostEdit(w http.ResponseWriter, r *http.Reques
 	}
 
 	// TODO: Update post in db and redirect to view post
+	post, err := app.post.GetPostByID(form.ID)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// update post
+	post.Title = form.Title
+	post.Content = form.Content
+	if err := app.post.Update(post); err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// Reset mostRecentPublicPost & latestPublicPosts app field
+	if err := app.UpdatePostsOnAppStruct(); err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// Redirect to view of updated post
+	w.Header().Set("HX-Redirect", fmt.Sprintf("/posts/view/%s", url.QueryEscape(post.Title)))
+	w.WriteHeader(http.StatusSeeOther)
+	// http.Redirect(w, r, fmt.Sprintf("/posts/view/%s", url.QueryEscape(post.Title)), http.StatusSeeOther)
 }
