@@ -156,11 +156,6 @@ func main() {
 		}
 	}
 
-	err = app.createPrivatePostsIfNoPostsExist()
-	if err != nil {
-		logger.Error("Unable to create private posts", "error", err)
-	}
-
 	srv := &http.Server{
 		Addr:         ":" + cfg.port,
 		Handler:      app.routes(),
