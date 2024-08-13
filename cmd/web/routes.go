@@ -4,16 +4,24 @@ import (
 	"net/http"
 
 	"github.com/justinas/alice"
+	"github.com/timenglesf/personal-site/internal/fileserver"
 	"github.com/timenglesf/personal-site/ui"
 )
 
 func (app *application) routes() http.Handler {
 	mux := http.NewServeMux()
 
-	// fileServer := http.FileServer(http.Dir("./ui/static/"))
-	fileServer := http.FileServerFS(ui.Files)
-	//	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
-	mux.Handle("/static/", fileServer)
+	// fileServer := http.FileServerFS(ui.Files)
+	// mux.Handle("/static/", fileServer)
+
+	var fileSvr http.Handler
+	if app.cfg.objectStorage.serveStaticObjectStorage {
+		fileSvr = &fileserver.ObjectStorageFileServer{ObjectStorageURL: app.cfg.objectStorage.objectStorageURL}
+	} else {
+		fileSvr = &fileserver.EmbeddedFileServer{FS: http.FS(ui.Files)}
+	}
+
+	mux.Handle("/static/", fileSvr)
 
 	dynamic := alice.New(app.sessionManager.LoadAndSave, app.noSurf)
 	mux.Handle("GET /{$}", dynamic.ThenFunc(app.home))
@@ -41,7 +49,7 @@ func (app *application) routes() http.Handler {
 	mux.Handle("POST /admin/login", dynamic.ThenFunc(app.handleAdminLoginPost))
 	mux.Handle("POST /admin/logout", dynamic.ThenFunc(app.handleAdminLogoutPost))
 
-	standard := alice.New(app.recoverPanic, app.logRequest, commonHeaders)
+	standard := alice.New(app.recoverPanic, app.logRequest, app.commonHeaders)
 
 	return standard.Then(mux)
 }

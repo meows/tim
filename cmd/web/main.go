@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"log/slog"
 	"net/http"
@@ -46,17 +47,41 @@ type config struct {
 	db   struct {
 		dsn string
 	}
+	objectStorage objectStorageConfig
+}
+
+type objectStorageConfig struct {
+	objectStorageURL         string
+	serveStaticObjectStorage bool
 }
 
 func main() {
 	var cfg config
 	flag.StringVar(&cfg.port, "port", os.Getenv("port"), "HTTP server port")
 	flag.StringVar(&cfg.db.dsn, "db-dsn", "./app.db", "SQLite3 DSN")
+	flag.BoolVar(&cfg.objectStorage.serveStaticObjectStorage, "object-storage", false, "Serve static files from object storage")
 
 	flag.Parse()
 
 	if cfg.port == "" {
 		cfg.port = "4000"
+	}
+
+	if cfg.objectStorage.serveStaticObjectStorage {
+		osURL := os.Getenv("OBJECT_STORAGE_URL")
+		if osURL == "" {
+			log.Fatal("OBJECT_STORAGE_URL must be set when object storage is enabled")
+		}
+		targetFile := fmt.Sprintf("%s/static/dist/js/form-prevent.js", osURL)
+		// #nosec G107
+		resp, err := http.Get(targetFile)
+		if err != nil {
+			log.Fatal("Unable to connect to object storage")
+		}
+		if resp.StatusCode != http.StatusOK {
+			log.Fatal("Unable to connect to object storage")
+		}
+		cfg.objectStorage.objectStorageURL = osURL
 	}
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
