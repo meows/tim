@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"runtime/debug"
 	"time"
@@ -95,7 +96,14 @@ func (app *application) renderBlogPostPage(w http.ResponseWriter, r *http.Reques
 func (app *application) UpdatePostsOnAppStruct() error {
 	mostRecentPublicPost, err := app.post.MostRecentPost(false)
 	if err != nil {
-		return err
+		if errors.Is(err, models.ErrNoRecord) {
+			mostRecentPublicPost = &models.Post{
+				Title:   "No posts yet",
+				Content: "This is a dummy post that will be removed when the first public post is added.",
+			}
+		} else {
+			return err
+		}
 	}
 
 	latestPublicPosts, err := app.post.LatestPosts(false)
@@ -103,34 +111,13 @@ func (app *application) UpdatePostsOnAppStruct() error {
 		return err
 	}
 
+	if len(latestPublicPosts) == 0 {
+		latestPublicPosts = append(latestPublicPosts, *mostRecentPublicPost)
+	}
+
+	fmt.Println(latestPublicPosts)
+
 	app.latestPublicPosts = &latestPublicPosts
 	app.mostRecentPost = mostRecentPublicPost
-	return nil
-}
-
-func (app *application) createPrivatePostsIfNoPostsExist() error {
-	c, err := app.post.Count(true)
-	if err != nil {
-		return err
-	}
-	if c == 0 {
-		c, err = app.post.Count(false)
-		if err != nil {
-			return err
-		}
-		if c == 0 {
-			post := models.Post{
-				Private:  true,
-				Title:    "This is a dummy post",
-				Content:  "This is a dummy post",
-				AuthorID: "dummy",
-			}
-
-			_, err := app.post.Insert(post.Title, post.Content, post.Private, post.AuthorID)
-			if err != nil {
-				return err
-			}
-		}
-	}
 	return nil
 }
