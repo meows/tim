@@ -57,7 +57,7 @@ type objectStorageConfig struct {
 
 func main() {
 	var cfg config
-	flag.StringVar(&cfg.port, "port", os.Getenv("port"), "HTTP server port")
+	flag.StringVar(&cfg.port, "port", os.Getenv("PORT"), "HTTP server port")
 	flag.StringVar(&cfg.db.dsn, "db-dsn", "./app.db", "SQLite3 DSN")
 	flag.BoolVar(&cfg.objectStorage.serveStaticObjectStorage, "object-storage", false, "Serve static files from object storage")
 
@@ -154,6 +154,11 @@ func main() {
 		} else {
 			logger.Info("Successfully inserted meta")
 		}
+	}
+
+	err = app.createPrivatePostsIfNoPostsExist()
+	if err != nil {
+		logger.Error("Unable to create private posts", "error", err)
 	}
 
 	srv := &http.Server{
