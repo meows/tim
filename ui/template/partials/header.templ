@@ -27,7 +27,7 @@ templ PageHeader(d *shared.TemplateData) {
 					//@navLink("/blog", "Blog")
 					@navLink(templ.SafeURL(fmt.Sprintf("/posts/view/%s", url.QueryEscape(d.MostRecentPublicPost.Title))), "Blog")
 					@navLink("/about", "About")
-					@navLink("/contact", "Contact")
+					@navLink("#", "Contact")
 					if  d.IsAuthenticated {
 						@navLink("/admin", "Dashboard")
 					}
