@@ -75,6 +75,9 @@ func (m *PostModel) MostRecentPost(includePrivatePosts bool) (*Post, error) {
 	var post Post
 	result := m.DB.Preload("Tags").Preload("Categories").Where("private = ?", includePrivatePosts).Order("created_at DESC").First(&post)
 	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, ErrNoRecord
+		}
 		return nil, result.Error
 	}
 	return &post, nil
