@@ -13,6 +13,7 @@ import (
 	"github.com/timenglesf/personal-site/internal/shared"
 	"github.com/timenglesf/personal-site/internal/validator"
 	"github.com/yuin/goldmark"
+	highlighting "github.com/yuin/goldmark-highlighting/v2"
 )
 
 // Create Post Handlers
@@ -111,8 +112,16 @@ func (app *application) handleGetBlogPost(w http.ResponseWriter, r *http.Request
 	data.BlogPost = post
 
 	// convert markdown to html
+	mdRenderer := goldmark.New(
+		goldmark.WithExtensions(
+			highlighting.NewHighlighting(
+				highlighting.WithStyle("dracula"),
+			),
+		),
+	)
+
 	var buf bytes.Buffer
-	if err := goldmark.Convert([]byte(data.BlogPost.Content), &buf); err != nil {
+	if err := mdRenderer.Convert([]byte(data.BlogPost.Content), &buf); err != nil {
 		app.logger.Error("Error converting markdown to html", "error", err)
 		app.serverError(w, r, err)
 		return
