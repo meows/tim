@@ -9,6 +9,7 @@ import (
 	"github.com/a-h/templ"
 	"github.com/go-playground/form/v4"
 	"github.com/justinas/nosurf"
+	"github.com/timenglesf/personal-site/internal/models"
 	"github.com/timenglesf/personal-site/internal/shared"
 )
 
@@ -21,24 +22,6 @@ func (app *application) serverError(w http.ResponseWriter, r *http.Request, err 
 	app.logger.Error(err.Error(), "method", method, "uri", uri, "trace", trace)
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }
-
-// func (app *application) logServerError(r *http.Request, err error) {
-// 	var (
-// 		method = r.Method
-// 		uri    = r.URL.RequestURI()
-// 		trace  = string(debug.Stack())
-// 	)
-// 	app.logger.Error(err.Error(), "method", method, "uri", uri, "trace", trace)
-// }
-//
-// func (app *application) logServerWarning(r *http.Request, err error) {
-// 	var (
-// 		method = r.Method
-// 		uri    = r.URL.RequestURI()
-// 		trace  = string(debug.Stack())
-// 	)
-// 	app.logger.Warn(err.Error(), "method", method, "uri", uri, "trace", trace)
-// }
 
 func (app *application) clientError(w http.ResponseWriter, status int) {
 	http.Error(w, http.StatusText(status), status)
@@ -122,5 +105,32 @@ func (app *application) UpdatePostsOnAppStruct() error {
 
 	app.latestPublicPosts = &latestPublicPosts
 	app.mostRecentPost = mostRecentPublicPost
+	return nil
+}
+
+func (app *application) createPrivatePostsIfNoPostsExist() error {
+	c, err := app.post.Count(true)
+	if err != nil {
+		return err
+	}
+	if c == 0 {
+		c, err = app.post.Count(false)
+		if err != nil {
+			return err
+		}
+		if c == 0 {
+			post := models.Post{
+				Private:  true,
+				Title:    "This is a dummy post",
+				Content:  "This is a dummy post",
+				AuthorID: "dummy",
+			}
+
+			_, err := app.post.Insert(post.Title, post.Content, post.Private, post.AuthorID)
+			if err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }
