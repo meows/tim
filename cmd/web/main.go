@@ -73,11 +73,11 @@ func main() {
 			log.Fatal("OBJECT_STORAGE_URL must be set when object storage is enabled")
 		}
 		targetFile := fmt.Sprintf("%s/static/dist/js/form-prevent.js", osURL)
+		// #nosec G107
 		resp, err := http.Get(targetFile)
 		if err != nil {
 			log.Fatal("Unable to connect to object storage")
 		}
-		fmt.Println(resp.StatusCode)
 		if resp.StatusCode != http.StatusOK {
 			log.Fatal("Unable to connect to object storage")
 		}
